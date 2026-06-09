@@ -214,6 +214,10 @@
 
     .ctrl-group { display: flex; flex-direction: column; gap: 7px; }
     .ctrl-label {
+      min-height: 24px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
       font-size: 0.78rem; font-weight: 700;
       letter-spacing: 0.03em; color: var(--muted);
       text-transform: uppercase;
@@ -748,13 +752,11 @@
       </div>
     </section>
 
-    <!-- CONTROLS -->
-    <div class="section-eyebrow">Controls</div>
     <section class="controls-card">
       <div class="ctrl-group control-group">
         <label class="ctrl-label" for="start-date-search">
           Start quarter
-          <button class="info-btn" type="button" id="q-info-start" aria-label="What is a quarter?" style="margin-left:4px">i</button>
+          <button class="info-btn" type="button" id="q-info-start" aria-label="What is a quarter?">i</button>
         </label>
         <select id="start-date-search"></select>
         <div class="quarter-legend" id="q-legend">
@@ -958,6 +960,7 @@
   const qLegend = document.getElementById("q-legend");
   if (qInfoBtn && qLegend) {
     qInfoBtn.addEventListener("click", (event) => {
+      event.preventDefault();
       event.stopPropagation();
       qLegend.classList.toggle("open");
     });
