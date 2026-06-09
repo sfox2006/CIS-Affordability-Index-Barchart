@@ -23,25 +23,10 @@ const elements = {
   basketRows: document.getElementById("basket-rows"),
   basketSummary: document.getElementById("basket-summary"),
   addBasketRow: document.getElementById("add-basket-row"),
-  primaryStatLabel: document.getElementById("primary-stat-label"),
-  selectedChange: document.getElementById("selected-change"),
-  cpiChange: document.getElementById("cpi-change"),
-  wpiChange: document.getElementById("wpi-change"),
-  gapCpiChange: document.getElementById("gap-cpi-change"),
   gapWpiChange: document.getElementById("gap-wpi-change"),
-  selectedRange: document.getElementById("selected-range"),
-  cpiRange: document.getElementById("cpi-range"),
-  wpiRange: document.getElementById("wpi-range"),
-  gapCpiRange: document.getElementById("gap-cpi-range"),
   gapWpiRange: document.getElementById("gap-wpi-range"),
-  legendSelected: document.getElementById("legend-selected"),
-  wpiLegendSelected: document.getElementById("wpi-legend-selected"),
-  cpiChartTitle: document.getElementById("cpi-chart-title"),
-  cpiChartSubtitle: document.getElementById("cpi-chart-subtitle"),
   wpiChartTitle: document.getElementById("wpi-chart-title"),
   wpiChartSubtitle: document.getElementById("wpi-chart-subtitle"),
-  wpiLegend: document.getElementById("wpi-legend"),
-  cpiChart: document.getElementById("cpi-chart"),
   wpiChart: document.getElementById("wpi-chart"),
   emptyState: document.getElementById("empty-state"),
 };
@@ -164,48 +149,36 @@ function applyQuickRange() {
 }
 
 function updateStatCards(filteredPoints) {
-  const firstPoint = filteredPoints[0];
-  const lastPoint = filteredPoints[filteredPoints.length - 1];
   const wpiPoints = filteredPoints.filter((point) => point.date >= WPI_START_DATE && Number.isFinite(point.wpiValue));
   const firstWpiPoint = wpiPoints[0];
   const lastWpiPoint = wpiPoints[wpiPoints.length - 1];
-  const selectedChange = computePercentChange(firstPoint.selectedValue, lastPoint.selectedValue);
-  const cpiChange = computePercentChange(firstPoint.cpiValue, lastPoint.cpiValue);
   const wpiAvailable = wpiPoints.length >= 2;
   const selectedWpiWindowChange = wpiAvailable ? computePercentChange(firstWpiPoint.selectedValue, lastWpiPoint.selectedValue) : null;
   const wpiChange = wpiAvailable ? computePercentChange(firstWpiPoint.wpiValue, lastWpiPoint.wpiValue) : null;
-  const gapCpi = Number.isFinite(selectedChange) && Number.isFinite(cpiChange) ? selectedChange - cpiChange : null;
   const gapWpi = wpiAvailable && Number.isFinite(selectedWpiWindowChange) && Number.isFinite(wpiChange) ? selectedWpiWindowChange - wpiChange : null;
-  const rangeLabel = `${formatQuarter(firstPoint.date)} to ${formatQuarter(lastPoint.date)}`;
   const wpiRangeLabel = wpiAvailable ? `${formatQuarter(firstWpiPoint.date)} to ${formatQuarter(lastWpiPoint.date)}` : "";
 
-  elements.selectedChange.textContent = formatPercent(selectedChange);
-  elements.cpiChange.textContent = formatPercent(cpiChange);
-  elements.wpiChange.textContent = wpiAvailable ? formatPercent(wpiChange) : "No data";
-  elements.gapCpiChange.textContent = formatPercent(gapCpi);
   elements.gapWpiChange.textContent = wpiAvailable ? formatPercent(gapWpi) : "No data";
-  elements.selectedRange.textContent = rangeLabel;
-  elements.cpiRange.textContent = rangeLabel;
-  elements.wpiRange.textContent = wpiAvailable ? wpiRangeLabel : "No wage data available for the selected range.";
-  elements.gapCpiRange.textContent = "Selected good minus CPI over the chosen window.";
   elements.gapWpiRange.textContent = wpiAvailable
-    ? "Selected good minus WPI over the matched wage-data window."
+    ? `Selected good minus WPI, ${wpiRangeLabel}.`
     : "WPI is unavailable for the chosen range.";
-
-  setMetricTone(elements.selectedChange, selectedChange, true);
-  setMetricTone(elements.cpiChange, cpiChange, true);
-  if (wpiAvailable) {
-    setMetricTone(elements.wpiChange, wpiChange, true);
-  } else {
-    elements.wpiChange.classList.remove("metric-positive", "metric-negative", "metric-neutral");
-    elements.wpiChange.classList.add("metric-neutral");
+  const heroStat = document.getElementById("hero-stat");
+  const heroStatLabel = document.getElementById("hero-stat-label");
+  if (heroStat && heroStatLabel) {
+    heroStat.textContent = wpiAvailable ? formatPercent(gapWpi) : "--";
+    heroStat.classList.remove("metric-positive", "metric-negative", "metric-neutral");
+    heroStatLabel.textContent = wpiAvailable
+      ? `Relative to wages, ${wpiRangeLabel}`
+      : "No wage data available for this range";
   }
-  setMetricTone(elements.gapCpiChange, gapCpi, true);
+
   if (wpiAvailable) {
     setMetricTone(elements.gapWpiChange, gapWpi, true);
+    if (heroStat) setMetricTone(heroStat, gapWpi, true);
   } else {
     elements.gapWpiChange.classList.remove("metric-positive", "metric-negative", "metric-neutral");
     elements.gapWpiChange.classList.add("metric-neutral");
+    if (heroStat) heroStat.classList.add("metric-neutral");
   }
 
   return { wpiAvailable };
@@ -410,32 +383,24 @@ function renderWpiComparisonChart(target, filteredPoints) {
 }
 
 function resetEmptyState(message) {
-  elements.cpiChartTitle.textContent = "Waiting for a selection";
-  elements.cpiChartSubtitle.textContent = "Both series are rebased to 100 at the selected start date.";
   elements.wpiChartTitle.textContent = "Waiting for a selection";
   elements.wpiChartSubtitle.textContent = "Both series are rebased to 100 at the selected start date. Wage data follows the bundled WPI workbook.";
-  elements.cpiChart.innerHTML = "";
   elements.wpiChart.innerHTML = "";
   elements.emptyState.textContent = message;
-  elements.selectedChange.textContent = "--";
-  elements.cpiChange.textContent = "--";
-  elements.wpiChange.textContent = "--";
-  elements.gapCpiChange.textContent = "--";
   elements.gapWpiChange.textContent = "--";
-  elements.wpiRange.textContent = "Available from the WPI workbook start date onward.";
-  elements.gapCpiRange.textContent = "Selected good minus CPI over the chosen window.";
   elements.gapWpiRange.textContent = "Selected good minus WPI over the chosen window.";
-  elements.wpiLegend.classList.add("is-hidden");
-  [
-    elements.selectedChange,
-    elements.cpiChange,
-    elements.wpiChange,
-    elements.gapCpiChange,
-    elements.gapWpiChange,
-  ].forEach((element) => {
-    element.classList.remove("metric-positive", "metric-negative");
-    element.classList.add("metric-neutral");
-  });
+  const heroStat = document.getElementById("hero-stat");
+  const heroStatLabel = document.getElementById("hero-stat-label");
+  if (heroStat) {
+    heroStat.textContent = "--";
+    heroStat.classList.remove("metric-positive", "metric-negative");
+    heroStat.classList.add("metric-neutral");
+  }
+  if (heroStatLabel) {
+    heroStatLabel.textContent = "Select a good to see its change relative to wages";
+  }
+  elements.gapWpiChange.classList.remove("metric-positive", "metric-negative");
+  elements.gapWpiChange.classList.add("metric-neutral");
 }
 
 function getSharedRangePoints(series) {
@@ -520,26 +485,19 @@ function updateView() {
     return;
   }
 
-  const rebasedCpiPoints = rebasePoints(filteredPoints, ["selectedValue", "cpiValue"]);
   const wpiPoints = filteredPoints.filter((point) => point.date >= WPI_START_DATE && Number.isFinite(point.wpiValue));
   const wpiAvailable = wpiPoints.length >= 2;
 
   elements.emptyState.textContent = "";
   updateStatCards(filteredPoints);
-  renderChart(elements.cpiChart, rebasedCpiPoints, {
-    keys: ["cpiValue", "selectedValue"],
-    classNames: { selectedValue: "selected", cpiValue: "cpi" },
-  });
 
   if (wpiAvailable) {
     renderWpiComparisonChart(elements.wpiChart, wpiPoints);
-    elements.wpiLegend.classList.remove("is-hidden");
     elements.wpiChartSubtitle.textContent = state.mode === "basket"
       ? `Each selected good has two bars over the matched WPI window (${formatQuarter(wpiPoints[0].date)} to ${formatQuarter(wpiPoints[wpiPoints.length - 1].date)}).`
       : `The selected good has two bars over the matched WPI window (${formatQuarter(wpiPoints[0].date)} to ${formatQuarter(wpiPoints[wpiPoints.length - 1].date)}).`;
   } else {
     elements.wpiChart.innerHTML = "";
-    elements.wpiLegend.classList.add("is-hidden");
     elements.wpiChartSubtitle.textContent = "No WPI data is available for this range. Please adjust the dates.";
   }
 }
@@ -610,15 +568,10 @@ function updateSingleSeriesView() {
   state.selectedSeries = series;
   state.sharedPoints = getSharedRangePoints(series);
   elements.selectionMeta.textContent = `${series.description} Available from ${formatQuarter(series.start)} to ${formatQuarter(series.end)}.`;
-  elements.primaryStatLabel.textContent = "Selected good change";
-  elements.legendSelected.textContent = series.label;
-  elements.wpiLegendSelected.textContent = series.label;
   populateDateSelects(state.sharedPoints);
   if (elements.horizonSelect.value !== "custom") {
     applyQuickRange();
   }
-  elements.cpiChartTitle.textContent = `${series.label} vs CPI`;
-  elements.cpiChartSubtitle.textContent = `${series.seriesId} and All groups CPI, both rebased to 100 at the selected start date.`;
   elements.wpiChartTitle.textContent = `${series.label}: inflation vs wage growth`;
   elements.wpiChartSubtitle.textContent = "Horizontal bars compare selected inflation with WPI wage growth.";
   updateView();
@@ -628,9 +581,6 @@ function updateBasketView() {
   renderBasketRows();
   const basket = buildBasketSeries();
   state.sharedPoints = basket.points;
-  elements.primaryStatLabel.textContent = "Custom basket change";
-  elements.legendSelected.textContent = basket.label;
-  elements.wpiLegendSelected.textContent = basket.label;
   elements.selectionMeta.textContent = basket.description;
 
   if (!basket.points.length) {
@@ -642,8 +592,6 @@ function updateBasketView() {
   if (elements.horizonSelect.value !== "custom") {
     applyQuickRange();
   }
-  elements.cpiChartTitle.textContent = `${basket.label} vs CPI`;
-  elements.cpiChartSubtitle.textContent = "Custom basket and All groups CPI, both rebased to 100 at the selected start date.";
   elements.wpiChartTitle.textContent = "Selected goods: inflation vs wage growth";
   elements.wpiChartSubtitle.textContent = "Each selected basket item has one inflation bar and one wage growth bar.";
   updateView();
