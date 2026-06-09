@@ -415,9 +415,6 @@
       gap: 16px;
       margin-bottom: 24px;
     }
-    .stats-grid-single {
-      max-width: 440px;
-    }
     .stat-card {
       background: var(--surface); border: 1px solid var(--line2);
       box-shadow: var(--sh); border-radius: var(--r);
@@ -474,7 +471,7 @@
     .chart-card {
       background: var(--surface); border: 1px solid var(--line2);
       box-shadow: var(--sh); border-radius: var(--r-lg);
-      padding: 32px;
+      padding: 36px;
       transition: background 0.35s;
       position: relative;
     }
@@ -502,7 +499,7 @@
     .chart-frame {
       position: relative;
       background: var(--bg2); border: 1px solid var(--line2);
-      border-radius: 14px; padding: 16px;
+      border-radius: 14px; padding: 22px 20px;
       overflow: visible;
     }
     .chart-frame svg { width: 100%; height: auto; display: block; }
@@ -563,7 +560,7 @@
     .comparison-heading,
     .comparison-row-label {
       fill: var(--ink);
-      font-size: 0.82rem;
+      font-size: 0.86rem;
       font-weight: 900;
     }
     .comparison-heading {
@@ -578,7 +575,7 @@
     }
     .comparison-value-label {
       fill: var(--ink);
-      font-size: 0.78rem;
+      font-size: 0.82rem;
     }
     .comparison-value-label-inside {
       fill: #ffffff;
@@ -857,20 +854,6 @@
         <div class="basket-footer-icon">&#8721;</div>
         <p id="basket-summary" class="field-help">Add at least two goods to build a basket.</p>
       </div>
-    </section>
-
-    <!-- STATS -->
-    <div class="section-eyebrow">Relative to wages</div>
-    <section class="stats-grid stats-grid-single">
-      <article class="stat-card stat-card-accent">
-        <div class="stat-head">
-          <p class="stat-label">Relative to Wages</p>
-          <button class="info-btn" type="button" data-info-toggle="gap-wpi-info" aria-label="Info">i</button>
-        </div>
-        <div id="gap-wpi-info" class="info-popover">This good's price change minus Wage Price Index change over the same period. Green means the good became more affordable relative to wages. Red means it became less affordable relative to wages.</div>
-        <h2 id="gap-wpi-change" class="stat-value">--</h2>
-        <p id="gap-wpi-range" class="stat-footnote">Selected good minus WPI.</p>
-      </article>
     </section>
 
     <!-- CHARTS -->

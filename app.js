@@ -23,8 +23,6 @@ const elements = {
   basketRows: document.getElementById("basket-rows"),
   basketSummary: document.getElementById("basket-summary"),
   addBasketRow: document.getElementById("add-basket-row"),
-  gapWpiChange: document.getElementById("gap-wpi-change"),
-  gapWpiRange: document.getElementById("gap-wpi-range"),
   wpiChartTitle: document.getElementById("wpi-chart-title"),
   wpiChartSubtitle: document.getElementById("wpi-chart-subtitle"),
   wpiChart: document.getElementById("wpi-chart"),
@@ -100,7 +98,7 @@ function fillSelect(select, options, formatter = (option) => option.label) {
 function populateSeriesSelect() {
   const options = getAvailableSeries().map((series) => ({
     value: series.seriesId,
-    label: `${series.label} (${series.seriesId})`,
+    label: series.label,
   }));
   fillSelect(elements.seriesSelect, options);
 }
@@ -158,10 +156,6 @@ function updateStatCards(filteredPoints) {
   const gapWpi = wpiAvailable && Number.isFinite(selectedWpiWindowChange) && Number.isFinite(wpiChange) ? selectedWpiWindowChange - wpiChange : null;
   const wpiRangeLabel = wpiAvailable ? `${formatQuarter(firstWpiPoint.date)} to ${formatQuarter(lastWpiPoint.date)}` : "";
 
-  elements.gapWpiChange.textContent = wpiAvailable ? formatPercent(gapWpi) : "No data";
-  elements.gapWpiRange.textContent = wpiAvailable
-    ? `Selected good minus WPI, ${wpiRangeLabel}.`
-    : "WPI is unavailable for the chosen range.";
   const heroStat = document.getElementById("hero-stat");
   const heroStatLabel = document.getElementById("hero-stat-label");
   if (heroStat && heroStatLabel) {
@@ -173,11 +167,8 @@ function updateStatCards(filteredPoints) {
   }
 
   if (wpiAvailable) {
-    setMetricTone(elements.gapWpiChange, gapWpi, true);
     if (heroStat) setMetricTone(heroStat, gapWpi, true);
   } else {
-    elements.gapWpiChange.classList.remove("metric-positive", "metric-negative", "metric-neutral");
-    elements.gapWpiChange.classList.add("metric-neutral");
     if (heroStat) heroStat.classList.add("metric-neutral");
   }
 
@@ -313,10 +304,10 @@ function renderWpiComparisonChart(target, filteredPoints) {
     return;
   }
 
-  const width = 980;
-  const rowHeight = 56;
-  const margin = { top: 76, right: 120, bottom: 42, left: 330 };
-  const height = Math.max(210, margin.top + margin.bottom + rows.length * rowHeight);
+  const width = 1120;
+  const rowHeight = 64;
+  const margin = { top: 88, right: 140, bottom: 54, left: 360 };
+  const height = Math.max(260, margin.top + margin.bottom + rows.length * rowHeight);
   const values = rows.map((row) => row.relativeChange).filter(Number.isFinite);
   const minValue = Math.min(0, ...values);
   const maxValue = Math.max(0, ...values);
@@ -346,10 +337,10 @@ function renderWpiComparisonChart(target, filteredPoints) {
         ? "more affordable relative to wages"
         : "unchanged relative to wages";
     return `
-      <rect class="${value > 0 ? "comparison-bar-price" : "comparison-bar-wage"}" x="${x.toFixed(2)}" y="${y}" width="${barWidth.toFixed(2)}" height="20" rx="4">
+      <rect class="${value > 0 ? "comparison-bar-price" : "comparison-bar-wage"}" x="${x.toFixed(2)}" y="${y}" width="${barWidth.toFixed(2)}" height="24" rx="5">
         <title>${escapeHtml(row.label)}: ${formatPercent(value)} relative to wages (${verdict}). Price change: ${formatPercent(row.priceChange)}. Wage growth: ${formatPercent(row.wageChange)}.</title>
       </rect>
-      <text class="${valueClass}" x="${valueX.toFixed(2)}" y="${y + 15}" text-anchor="${anchor}">${formatPercent(value)}</text>
+      <text class="${valueClass}" x="${valueX.toFixed(2)}" y="${y + 17}" text-anchor="${anchor}">${formatPercent(value)}</text>
     `;
   }
 
@@ -357,7 +348,7 @@ function renderWpiComparisonChart(target, filteredPoints) {
     const y = margin.top + index * rowHeight;
     return `
       <line class="comparison-row-rule" x1="28" y1="${y - 18}" x2="${width - 28}" y2="${y - 18}"></line>
-      <text class="comparison-row-label" x="${plotLeft - 22}" y="${y + 16}" text-anchor="end">${escapeHtml(row.label)}</text>
+      <text class="comparison-row-label" x="${plotLeft - 24}" y="${y + 18}" text-anchor="end">${escapeHtml(row.label)}</text>
       ${barMarkup(row, row.relativeChange, y - 2)}
     `;
   }).join("");
@@ -390,8 +381,6 @@ function resetEmptyState(message) {
   elements.wpiChartSubtitle.textContent = "Both series are rebased to 100 at the selected start date. Wage data follows the bundled WPI workbook.";
   elements.wpiChart.innerHTML = "";
   elements.emptyState.textContent = message;
-  elements.gapWpiChange.textContent = "--";
-  elements.gapWpiRange.textContent = "Selected good minus WPI over the chosen window.";
   const heroStat = document.getElementById("hero-stat");
   const heroStatLabel = document.getElementById("hero-stat-label");
   if (heroStat) {
@@ -402,8 +391,6 @@ function resetEmptyState(message) {
   if (heroStatLabel) {
     heroStatLabel.textContent = "Select a good to see its change relative to wages";
   }
-  elements.gapWpiChange.classList.remove("metric-positive", "metric-negative");
-  elements.gapWpiChange.classList.add("metric-neutral");
 }
 
 function getSharedRangePoints(series) {
@@ -521,7 +508,7 @@ function renderBasketRows() {
     const select = document.createElement("select");
     const options = getAvailableSeries().map((series) => ({
       value: series.seriesId,
-      label: `${series.label} (${series.seriesId})`,
+      label: series.label,
     }));
     fillSelect(select, options);
     select.value = row.seriesId;
