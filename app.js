@@ -313,10 +313,10 @@ function renderWpiComparisonChart(target, filteredPoints) {
     return;
   }
 
-  const width = 920;
-  const rowHeight = 48;
-  const margin = { top: 78, right: 118, bottom: 36, left: 250 };
-  const height = Math.max(220, margin.top + margin.bottom + rows.length * rowHeight);
+  const width = 980;
+  const rowHeight = 56;
+  const margin = { top: 76, right: 120, bottom: 42, left: 330 };
+  const height = Math.max(210, margin.top + margin.bottom + rows.length * rowHeight);
   const values = rows.map((row) => row.relativeChange).filter(Number.isFinite);
   const minValue = Math.min(0, ...values);
   const maxValue = Math.max(0, ...values);
@@ -324,34 +324,41 @@ function renderWpiComparisonChart(target, filteredPoints) {
   const plotLeft = margin.left;
   const plotRight = width - margin.right;
   const zeroX = plotLeft + (plotRight - plotLeft) / 2;
-  const scale = (plotRight - plotLeft) / 2 / maxAbs;
+  const halfPlotWidth = (plotRight - plotLeft) / 2;
+  const scale = halfPlotWidth / maxAbs;
 
   target.setAttribute("viewBox", `0 0 ${width} ${height}`);
 
   function barMarkup(row, value, y) {
     const x = value >= 0 ? zeroX : zeroX + value * scale;
     const barWidth = Math.max(2, Math.abs(value * scale));
-    const valueX = value >= 0 ? x + barWidth + 8 : x - 8;
-    const anchor = value >= 0 ? "start" : "end";
+    const hasRoomInside = barWidth > 54;
+    const valueX = value >= 0
+      ? (hasRoomInside ? x + barWidth - 10 : x + barWidth + 8)
+      : (hasRoomInside ? x + 10 : x - 8);
+    const anchor = value >= 0
+      ? (hasRoomInside ? "end" : "start")
+      : (hasRoomInside ? "start" : "end");
+    const valueClass = hasRoomInside ? "comparison-value-label comparison-value-label-inside" : "comparison-value-label";
     const verdict = value > 0
       ? "less affordable relative to wages"
       : value < 0
         ? "more affordable relative to wages"
         : "unchanged relative to wages";
     return `
-      <rect class="${value > 0 ? "comparison-bar-price" : "comparison-bar-wage"}" x="${x.toFixed(2)}" y="${y}" width="${barWidth.toFixed(2)}" height="18" rx="3">
+      <rect class="${value > 0 ? "comparison-bar-price" : "comparison-bar-wage"}" x="${x.toFixed(2)}" y="${y}" width="${barWidth.toFixed(2)}" height="20" rx="4">
         <title>${escapeHtml(row.label)}: ${formatPercent(value)} relative to wages (${verdict}). Price change: ${formatPercent(row.priceChange)}. Wage growth: ${formatPercent(row.wageChange)}.</title>
       </rect>
-      <text class="comparison-value-label" x="${valueX.toFixed(2)}" y="${y + 14}" text-anchor="${anchor}">${formatPercent(value)}</text>
+      <text class="${valueClass}" x="${valueX.toFixed(2)}" y="${y + 15}" text-anchor="${anchor}">${formatPercent(value)}</text>
     `;
   }
 
   const rowMarkup = rows.map((row, index) => {
     const y = margin.top + index * rowHeight;
     return `
-      <line class="comparison-row-rule" x1="22" y1="${y - 20}" x2="${width - 28}" y2="${y - 20}"></line>
-      <text class="comparison-row-label" x="${plotLeft - 16}" y="${y + 18}" text-anchor="end">${escapeHtml(row.label)}</text>
-      ${barMarkup(row, row.relativeChange, y)}
+      <line class="comparison-row-rule" x1="28" y1="${y - 18}" x2="${width - 28}" y2="${y - 18}"></line>
+      <text class="comparison-row-label" x="${plotLeft - 22}" y="${y + 16}" text-anchor="end">${escapeHtml(row.label)}</text>
+      ${barMarkup(row, row.relativeChange, y - 2)}
     `;
   }).join("");
 
@@ -364,7 +371,7 @@ function renderWpiComparisonChart(target, filteredPoints) {
   }).join("");
 
   target.innerHTML = `
-    <text class="comparison-heading" x="22" y="30">Good</text>
+    <text class="comparison-heading" x="28" y="30">Good</text>
     <text class="comparison-heading" x="${plotLeft}" y="30">Price change relative to wages</text>
     <g class="comparison-key" transform="translate(${plotLeft}, 50)">
       <rect class="comparison-bar-wage" x="0" y="-11" width="16" height="10" rx="2"></rect>
