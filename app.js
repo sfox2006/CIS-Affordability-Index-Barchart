@@ -279,15 +279,15 @@ function getWpiComparisonRows(filteredPoints) {
   const firstPoint = filteredPoints[0];
   const lastPoint = filteredPoints[filteredPoints.length - 1];
   const wageChange = computePercentChange(firstPoint.wpiValue, lastPoint.wpiValue);
-  const withRatio = (row) => ({
+  const withRelativeChange = (row) => ({
     ...row,
-    affordabilityRatio: Number.isFinite(row.priceChange) && row.priceChange !== 0 && Number.isFinite(row.wageChange)
-      ? row.wageChange / row.priceChange
+    relativeChange: Number.isFinite(row.priceChange) && Number.isFinite(row.wageChange)
+      ? row.priceChange - row.wageChange
       : null,
   });
 
   if (state.mode !== "basket") {
-    return [withRatio({
+    return [withRelativeChange({
       label: state.selectedSeries?.label || "Selected good",
       priceChange: computePercentChange(firstPoint.selectedValue, lastPoint.selectedValue),
       wageChange,
@@ -296,21 +296,13 @@ function getWpiComparisonRows(filteredPoints) {
 
   return getBasketSelections().map((item) => {
     const lookup = new Map(item.series.observations.map((point) => [point.date, point.value]));
-    return withRatio({
+    return withRelativeChange({
       label: item.series.label,
       priceChange: computePercentChange(lookup.get(firstPoint.date), lookup.get(lastPoint.date)),
       wageChange,
     });
   })
-    .filter((row) => Number.isFinite(row.priceChange) && Number.isFinite(row.wageChange))
-    .sort((a, b) => {
-      if (Number.isFinite(b.affordabilityRatio) && Number.isFinite(a.affordabilityRatio)) {
-        return b.affordabilityRatio - a.affordabilityRatio;
-      }
-      if (Number.isFinite(b.affordabilityRatio)) return 1;
-      if (Number.isFinite(a.affordabilityRatio)) return -1;
-      return 0;
-    });
+    .filter((row) => Number.isFinite(row.relativeChange));
 }
 
 function renderWpiComparisonChart(target, filteredPoints) {
@@ -322,10 +314,10 @@ function renderWpiComparisonChart(target, filteredPoints) {
   }
 
   const width = 920;
-  const rowHeight = 70;
+  const rowHeight = 48;
   const margin = { top: 78, right: 118, bottom: 36, left: 250 };
   const height = Math.max(220, margin.top + margin.bottom + rows.length * rowHeight);
-  const values = rows.flatMap((row) => [row.priceChange, row.wageChange]).filter(Number.isFinite);
+  const values = rows.map((row) => row.relativeChange).filter(Number.isFinite);
   const minValue = Math.min(0, ...values);
   const maxValue = Math.max(0, ...values);
   const maxAbs = Math.max(Math.abs(minValue), Math.abs(maxValue), 1);
@@ -336,16 +328,21 @@ function renderWpiComparisonChart(target, filteredPoints) {
 
   target.setAttribute("viewBox", `0 0 ${width} ${height}`);
 
-  function barMarkup(row, value, y, kind, label) {
+  function barMarkup(row, value, y) {
     const x = value >= 0 ? zeroX : zeroX + value * scale;
     const barWidth = Math.max(2, Math.abs(value * scale));
     const valueX = value >= 0 ? x + barWidth + 8 : x - 8;
     const anchor = value >= 0 ? "start" : "end";
+    const verdict = value > 0
+      ? "less affordable relative to wages"
+      : value < 0
+        ? "more affordable relative to wages"
+        : "unchanged relative to wages";
     return `
-      <rect class="comparison-bar-${kind}" x="${x.toFixed(2)}" y="${y}" width="${barWidth.toFixed(2)}" height="16" rx="3">
-        <title>${escapeHtml(row.label)} ${label.toLowerCase()}: ${formatPercent(value)}. Affordability ratio: ${Number.isFinite(row.affordabilityRatio) ? row.affordabilityRatio.toFixed(2) : "n/a"}</title>
+      <rect class="${value > 0 ? "comparison-bar-price" : "comparison-bar-wage"}" x="${x.toFixed(2)}" y="${y}" width="${barWidth.toFixed(2)}" height="18" rx="3">
+        <title>${escapeHtml(row.label)}: ${formatPercent(value)} relative to wages (${verdict}). Price change: ${formatPercent(row.priceChange)}. Wage growth: ${formatPercent(row.wageChange)}.</title>
       </rect>
-      <text class="comparison-value-label" x="${valueX.toFixed(2)}" y="${y + 13}" text-anchor="${anchor}">${formatPercent(value)}</text>
+      <text class="comparison-value-label" x="${valueX.toFixed(2)}" y="${y + 14}" text-anchor="${anchor}">${formatPercent(value)}</text>
     `;
   }
 
@@ -354,8 +351,7 @@ function renderWpiComparisonChart(target, filteredPoints) {
     return `
       <line class="comparison-row-rule" x1="22" y1="${y - 20}" x2="${width - 28}" y2="${y - 20}"></line>
       <text class="comparison-row-label" x="${plotLeft - 16}" y="${y + 18}" text-anchor="end">${escapeHtml(row.label)}</text>
-      ${barMarkup(row, row.priceChange, y, "price", "Inflation")}
-      ${barMarkup(row, row.wageChange, y + 24, "wage", "Wage growth")}
+      ${barMarkup(row, row.relativeChange, y)}
     `;
   }).join("");
 
@@ -369,12 +365,12 @@ function renderWpiComparisonChart(target, filteredPoints) {
 
   target.innerHTML = `
     <text class="comparison-heading" x="22" y="30">Good</text>
-    <text class="comparison-heading" x="${plotLeft}" y="30">Bars for % change</text>
+    <text class="comparison-heading" x="${plotLeft}" y="30">Price change relative to wages</text>
     <g class="comparison-key" transform="translate(${plotLeft}, 50)">
-      <rect class="comparison-bar-price" x="0" y="-11" width="16" height="10" rx="2"></rect>
-      <text class="comparison-key-label" x="23" y="-2">Inflation</text>
-      <rect class="comparison-bar-wage" x="112" y="-11" width="16" height="10" rx="2"></rect>
-      <text class="comparison-key-label" x="135" y="-2">Wage growth</text>
+      <rect class="comparison-bar-wage" x="0" y="-11" width="16" height="10" rx="2"></rect>
+      <text class="comparison-key-label" x="23" y="-2">More affordable</text>
+      <rect class="comparison-bar-price" x="150" y="-11" width="16" height="10" rx="2"></rect>
+      <text class="comparison-key-label" x="173" y="-2">Less affordable</text>
     </g>
     <line class="comparison-axis" x1="${zeroX}" y1="${margin.top - 30}" x2="${zeroX}" y2="${height - margin.bottom + 10}"></line>
     ${axisTicks}
@@ -494,8 +490,8 @@ function updateView() {
   if (wpiAvailable) {
     renderWpiComparisonChart(elements.wpiChart, wpiPoints);
     elements.wpiChartSubtitle.textContent = state.mode === "basket"
-      ? `Each selected good has two bars over the matched WPI window (${formatQuarter(wpiPoints[0].date)} to ${formatQuarter(wpiPoints[wpiPoints.length - 1].date)}).`
-      : `The selected good has two bars over the matched WPI window (${formatQuarter(wpiPoints[0].date)} to ${formatQuarter(wpiPoints[wpiPoints.length - 1].date)}).`;
+      ? `Each selected good is shown as price change minus wage growth (${formatQuarter(wpiPoints[0].date)} to ${formatQuarter(wpiPoints[wpiPoints.length - 1].date)}).`
+      : `The selected good is shown as price change minus wage growth (${formatQuarter(wpiPoints[0].date)} to ${formatQuarter(wpiPoints[wpiPoints.length - 1].date)}).`;
   } else {
     elements.wpiChart.innerHTML = "";
     elements.wpiChartSubtitle.textContent = "No WPI data is available for this range. Please adjust the dates.";
@@ -572,8 +568,8 @@ function updateSingleSeriesView() {
   if (elements.horizonSelect.value !== "custom") {
     applyQuickRange();
   }
-  elements.wpiChartTitle.textContent = `${series.label}: inflation vs wage growth`;
-  elements.wpiChartSubtitle.textContent = "Horizontal bars compare selected inflation with WPI wage growth.";
+  elements.wpiChartTitle.textContent = `${series.label}: price change relative to wages`;
+  elements.wpiChartSubtitle.textContent = "The bar shows selected price growth minus WPI wage growth.";
   updateView();
 }
 
@@ -592,8 +588,8 @@ function updateBasketView() {
   if (elements.horizonSelect.value !== "custom") {
     applyQuickRange();
   }
-  elements.wpiChartTitle.textContent = "Selected goods: inflation vs wage growth";
-  elements.wpiChartSubtitle.textContent = "Each selected basket item has one inflation bar and one wage growth bar.";
+  elements.wpiChartTitle.textContent = "Selected goods: price change relative to wages";
+  elements.wpiChartSubtitle.textContent = "Each selected basket item has one bar for price growth minus WPI wage growth.";
   updateView();
 }
 

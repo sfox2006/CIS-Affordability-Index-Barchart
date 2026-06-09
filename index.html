@@ -877,17 +877,17 @@
         </div>
         <div class="chart-header">
           <div>
-            <p class="eyebrow"><span class="eyebrow-dot"></span> Price vs WPI</p>
+            <p class="eyebrow"><span class="eyebrow-dot"></span> Relative to wages</p>
             <h2 id="wpi-chart-title" class="chart-title">Waiting for a selection</h2>
           </div>
           <div class="chart-head-right">
             <button class="info-btn" type="button" data-info-toggle="wpi-chart-info" aria-label="Info">i</button>
-            <p id="wpi-chart-subtitle" class="chart-subtitle">Both series rebased to 100 at start date. Wage data follows the bundled WPI workbook.</p>
+            <p id="wpi-chart-subtitle" class="chart-subtitle">Price growth minus WPI wage growth.</p>
           </div>
         </div>
         <div id="wpi-chart-info" class="info-popover">If inflation for the selected good is higher than wage growth, it became less affordable relative to wages. Wage data follows the bundled WPI workbook.</div>
 <div class="chart-frame" id="wpi-chart-frame">
-          <svg id="wpi-chart" viewBox="0 0 920 420" role="img" aria-label="Bar chart: selected inflation and wage growth"></svg>
+          <svg id="wpi-chart" viewBox="0 0 920 420" role="img" aria-label="Bar chart: price change relative to wages"></svg>
           <div class="chart-tooltip" id="wpi-tooltip"></div>
         </div>
         <p id="empty-state" class="empty-state">Pick a good or group to draw the comparison.</p>
