@@ -274,7 +274,7 @@
       border-radius: var(--r-lg);
       padding: 24px 28px;
       display: grid;
-      grid-template-columns: 1.15fr 1.45fr 0.95fr 0.95fr 0.95fr;
+      grid-template-columns: repeat(3, minmax(0,1fr));
       gap: 18px;
       margin-bottom: 24px;
       transition: background 0.35s;
@@ -406,6 +406,60 @@
       border-radius: 50%; background: rgba(14,107,92,0.08);
       display: flex; align-items: center; justify-content: center;
       color: var(--cg); font-size: 0.68rem; font-weight: 800;
+    }
+    .ranking-panel {
+      margin-top: 22px;
+      padding-top: 20px;
+      border-top: 1px solid var(--line2);
+    }
+    .ranking-title {
+      font-size: 0.78rem;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+    .ranking-list {
+      display: grid;
+      gap: 10px;
+    }
+    .ranking-row {
+      display: grid;
+      grid-template-columns: 36px 1fr auto;
+      align-items: center;
+      gap: 12px;
+      min-height: 48px;
+      padding: 10px 14px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--bg);
+    }
+    .ranking-index {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(14,107,92,0.1);
+      color: var(--cg);
+      font-weight: 900;
+      font-size: 0.76rem;
+    }
+    .ranking-label {
+      font-weight: 900;
+      color: var(--ink);
+    }
+    .ranking-value {
+      font-weight: 900;
+      white-space: nowrap;
+    }
+    .ranking-value.more {
+      color: var(--good);
+    }
+    .ranking-value.less {
+      color: var(--bad);
     }
 
     /* Section */
@@ -787,18 +841,6 @@
     <div class="section-eyebrow">Controls</div>
     <section class="controls-card">
       <div class="ctrl-group control-group">
-        <label class="ctrl-label" for="mode-select">Mode</label>
-        <select id="mode-select">
-          <option value="single">Single good</option>
-          <option value="basket">Custom basket</option>
-        </select>
-      </div>
-      <div class="ctrl-group control-group" id="series-group" style="grid-column: span 1;">
-        <label class="ctrl-label" for="series-search">Good or group</label>
-        <select id="series-search"></select>
-        <p id="selection-meta" class="field-help">Scroll through the full ABS series list.</p>
-      </div>
-      <div class="ctrl-group control-group">
         <label class="ctrl-label" for="start-date-search">
           Start quarter
           <button class="info-btn" type="button" id="q-info-start" aria-label="What is a quarter?" style="margin-left:4px">i</button>
@@ -824,11 +866,11 @@
     </section>
 
     <!-- BASKET -->
-    <section id="basket-builder" class="basket-card is-hidden">
+    <section id="basket-builder" class="basket-card">
       <div class="basket-header">
         <div>
           <p class="eyebrow"><span class="eyebrow-dot"></span> Custom Basket</p>
-          <p class="basket-title">Build an illustrative basket of goods</p>
+          <p class="basket-title">Choose goods to compare</p>
         </div>
         <div class="basket-actions">
           <button id="add-basket-row" type="button" class="secondary-button">+ Add good</button>
@@ -838,7 +880,7 @@
       <!-- Explainer -->
       <div class="basket-explainer">
         <div class="basket-explainer-icon">i</div>
-        <p>A <strong>basket</strong> lets you combine multiple goods into a single composite series. Each selected good is treated equally, and the wage comparison below shows every basket item separately.</p>
+        <p>Add goods or categories, then compare each one by price change relative to wage growth. Each selected item appears as its own bar below.</p>
       </div>
 
       <!-- Column headers -->
@@ -852,7 +894,7 @@
 
       <div class="basket-footer">
         <div class="basket-footer-icon">&#8721;</div>
-        <p id="basket-summary" class="field-help">Add at least two goods to build a basket.</p>
+        <p id="basket-summary" class="field-help">Add at least one good to build a chart.</p>
       </div>
     </section>
 
@@ -883,6 +925,10 @@
 <div class="chart-frame" id="wpi-chart-frame">
           <svg id="wpi-chart" viewBox="0 0 920 420" role="img" aria-label="Bar chart: price change relative to wages"></svg>
           <div class="chart-tooltip" id="wpi-tooltip"></div>
+        </div>
+        <div class="ranking-panel" aria-labelledby="ranking-title">
+          <p class="ranking-title" id="ranking-title">Ranking of selected goods</p>
+          <div class="ranking-list" id="ranking-list"></div>
         </div>
         <p id="empty-state" class="empty-state">Pick a good or group to draw the comparison.</p>
       </article>
@@ -937,17 +983,13 @@
 
   function getState() {
     return {
-      s: document.getElementById("series-search")?.value,
       start: document.getElementById("start-date-search")?.value,
       end: document.getElementById("end-date-search")?.value,
-      m: document.getElementById("mode-select")?.value,
       h: document.getElementById("time-horizon-search")?.value
     };
   }
 
   function setState(state) {
-    if (state.m) document.getElementById("mode-select").value = state.m;
-    if (state.s) document.getElementById("series-search").value = state.s;
     if (state.h) document.getElementById("time-horizon-search").value = state.h;
     if (state.start) document.getElementById("start-date-search").value = state.start;
     if (state.end) document.getElementById("end-date-search").value = state.end;
@@ -995,7 +1037,7 @@
     }
   });
 
-  ["series-search", "start-date-search", "end-date-search", "mode-select", "time-horizon-search"].forEach((id) => {
+  ["start-date-search", "end-date-search", "time-horizon-search"].forEach((id) => {
     document.getElementById(id)?.addEventListener("change", pushState);
   });
 
@@ -1088,7 +1130,7 @@
       setTimeout(() => {
         try {
           setState(saved);
-          document.getElementById("series-search")?.dispatchEvent(new Event("change"));
+          document.getElementById("start-date-search")?.dispatchEvent(new Event("change"));
         } catch (error) {}
       }, 800);
     }
