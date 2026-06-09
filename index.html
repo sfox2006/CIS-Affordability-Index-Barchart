@@ -169,7 +169,7 @@
 
     .hero-inner {
       display: grid;
-      grid-template-columns: 1fr 340px;
+      grid-template-columns: 1fr;
       gap: 0;
     }
 
@@ -178,20 +178,6 @@
     }
 
     .theme-editorial .hero-copy { padding: 52px 40px 52px 52px; }
-
-    .eyebrow {
-      display: inline-flex; align-items: center; gap: 8px;
-      font-size: 0.73rem; font-weight: 800;
-      letter-spacing: 0.12em; text-transform: uppercase;
-      color: var(--cg); margin-bottom: 14px;
-    }
-    .theme-editorial .eyebrow { color: var(--teal); }
-    .theme-dark .eyebrow { color: var(--teal); }
-
-    .eyebrow-dot {
-      width: 5px; height: 5px; border-radius: 50%;
-      background: currentColor; flex-shrink: 0;
-    }
 
     .hero-h1 {
       font-family: 'Fraunces', serif;
@@ -208,63 +194,9 @@
 
     .hero-lead {
       font-size: 1rem; line-height: 1.65; color: var(--muted);
-      max-width: 54ch; margin-bottom: 24px;
+      max-width: 62ch; margin-bottom: 0;
     }
     .theme-editorial .hero-lead { color: rgba(255,255,255,0.7); }
-
-    .hero-meta {
-      display: flex; gap: 24px; flex-wrap: wrap; align-items: center;
-    }
-    .hero-meta-item {
-      display: flex; align-items: center; gap: 8px;
-      font-size: 0.8rem; color: var(--muted);
-    }
-    .theme-editorial .hero-meta-item { color: rgba(255,255,255,0.55); }
-    .hero-meta-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--teal); }
-
-    /* Insight panel */
-    .hero-panel {
-      display: flex; flex-direction: column;
-      border-left: 1px solid var(--line);
-      padding: 36px 32px;
-      background: var(--surface2);
-      gap: 20px;
-    }
-    .theme-editorial .hero-panel {
-      background: rgba(255,255,255,0.06);
-      border-left-color: rgba(255,255,255,0.1);
-    }
-    .theme-dark .hero-panel { background: var(--bg2); }
-
-    .panel-label {
-      font-size: 0.72rem; font-weight: 800;
-      letter-spacing: 0.1em; text-transform: uppercase;
-      color: var(--muted);
-    }
-    .theme-editorial .panel-label { color: rgba(255,255,255,0.45); }
-
-    .panel-stat-big {
-      font-family: 'Fraunces', serif;
-      font-size: 3.2rem; font-weight: 600;
-      letter-spacing: -0.04em;
-      line-height: 1;
-      color: var(--ink);
-    }
-    .theme-editorial .panel-stat-big { color: #fff; }
-
-    .panel-stat-label {
-      font-size: 0.82rem; color: var(--muted); line-height: 1.5;
-      margin-top: 4px;
-    }
-    .theme-editorial .panel-stat-label { color: rgba(255,255,255,0.6); }
-
-    .panel-divider {
-      height: 1px; background: var(--line);
-    }
-    .theme-editorial .panel-divider { background: rgba(255,255,255,0.1); }
-
-    #source-text { font-size: 0.8rem; color: var(--muted); line-height: 1.5; }
-    .theme-editorial #source-text { color: rgba(255,255,255,0.5); }
 
     /* Section */
     .controls-card {
@@ -752,7 +684,6 @@
     }
     @media (max-width: 860px) {
       .hero-inner { grid-template-columns: 1fr !important; }
-      .hero-panel { border-left: none; border-top: 1px solid var(--line); }
       .controls-card { grid-template-columns: 1fr 1fr; }
       .stats-grid { grid-template-columns: repeat(2, 1fr); }
     }
@@ -763,7 +694,6 @@
       .nav-sep { display: none; }
       .nav-btn:not(.nav-btn-primary) { display: none; }
       .hero-copy { padding: 24px 20px; }
-      .hero-panel { padding: 20px; }
       .controls-card { padding: 18px 16px; }
       .chart-card { padding: 20px 16px 18px; }
       .shell { padding: 20px 0 48px; }
@@ -810,29 +740,10 @@
     <section class="hero">
       <div class="hero-inner">
         <div class="hero-copy">
-          <p class="eyebrow"><span class="eyebrow-dot"></span> Consumer Price Index Explorer</p>
           <h1 class="hero-h1">How affordable are the things Australians buy?</h1>
           <p class="hero-lead">
-            Compare any tracked good or goods group against overall CPI and the Wage Price Index.
-            Built from ABS Table 18. Choose a series, set a time window, and compare price growth with wage growth.
+            Compare the change in the price of a good or goods group against the change in wages over your chosen time period.
           </p>
-          <div class="hero-meta">
-            <span class="hero-meta-item"><span class="hero-meta-dot"></span> <span id="source-text">Loading ABS dataset...</span></span>
-            <span class="hero-meta-item"><span class="hero-meta-dot"></span> Quarterly data</span>
-            <span class="hero-meta-item"><span class="hero-meta-dot"></span> WPI from Sep 1997</span>
-          </div>
-        </div>
-        <div class="hero-panel">
-          <p class="panel-label">Snapshot</p>
-          <div>
-            <div class="panel-stat-big" id="hero-stat">--</div>
-            <div class="panel-stat-label" id="hero-stat-label">Select a good to see its change relative to wages</div>
-          </div>
-          <div class="panel-divider"></div>
-          <div>
-            <div class="panel-label" style="margin-bottom:6px">Methodology</div>
-            <p style="font-size:0.78rem;color:var(--muted);line-height:1.55">The bars compare the selected price change with wage growth over the same wage-data window.</p>
-          </div>
         </div>
       </div>
     </section>

@@ -10,7 +10,6 @@ const WPI_START_DATE = window.WPI_DATA?.[0]?.date || "2010-12-01";
 const WPI_DATA = window.WPI_DATA || [];
 
 const elements = {
-  sourceText: document.getElementById("source-text"),
   startSelect: document.getElementById("start-date-search"),
   endSelect: document.getElementById("end-date-search"),
   horizonSelect: document.getElementById("time-horizon-search"),
@@ -592,7 +591,6 @@ async function init() {
 
   populateHorizonSelect();
 
-  elements.sourceText.textContent = `${dataset.source}. ${getAvailableSeries().length} goods and goods-group series available.`;
   elements.horizonSelect.value = "custom";
 
   const initialSeries =
@@ -649,7 +647,6 @@ async function init() {
 
 init().catch((error) => {
   console.error(error);
-  elements.sourceText.textContent = "Unable to load the bundled CPI dataset.";
   resetEmptyState("The application could not load the workbook data.");
 });
 
