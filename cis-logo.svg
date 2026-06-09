@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 172 68" role="img" aria-label="Centre for Independent Studies">
+  <rect width="172" height="68" fill="#ffffff"/>
+  <circle cx="34" cy="34" r="30" fill="#0e6b5c"/>
+  <text x="34" y="43" text-anchor="middle" font-family="Georgia, serif" font-size="27" font-weight="700" fill="#ffffff">CIS</text>
+  <text x="76" y="29" font-family="Arial, sans-serif" font-size="10" font-weight="700" fill="#0e6b5c" letter-spacing="1.2">CENTRE FOR</text>
+  <text x="76" y="45" font-family="Arial, sans-serif" font-size="10" font-weight="700" fill="#0e6b5c" letter-spacing="1.2">INDEPENDENT STUDIES</text>
+</svg>
