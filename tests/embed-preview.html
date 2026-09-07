@@ -24,6 +24,20 @@
     </div>
   </main>
   <footer>End of embedding page</footer>
+  <output id="measurements" style="display:block;white-space:pre-wrap;padding:24px;"></output>
   <script src="../embed.js?v=1" defer></script>
+  <script>
+    const report = () => {
+      document.getElementById('measurements').textContent = [...document.querySelectorAll('iframe')].map((frame) => {
+        const root = frame.contentDocument?.documentElement;
+        if (!root) return frame.title + ': loading';
+        return `${frame.title}: frame ${frame.clientWidth} x ${frame.clientHeight}; content ${root.scrollWidth} x ${root.scrollHeight}; viewport ${root.clientWidth} x ${root.clientHeight}; vertical overflow ${root.scrollHeight - root.clientHeight}; horizontal overflow ${root.scrollWidth - root.clientWidth}`;
+      }).join('\n');
+    };
+    window.addEventListener('message', (event) => {
+      if (event.origin === window.location.origin && event.data?.type === 'cis-affordability-height') requestAnimationFrame(report);
+    });
+    window.addEventListener('load', report);
+  </script>
 </body>
 </html>
