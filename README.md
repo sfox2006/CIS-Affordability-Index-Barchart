@@ -1,9 +1,6 @@
 # CIS Affordability Index
 
-Local website for comparing selected CPI goods or custom baskets against:
-
-- `All groups CPI`
-- `Wage Price Index (WPI)`
+Static website comparing each selected CPI good or goods group with the Wage Price Index (WPI) over the same selected quarters.
 
 ## Static deployment
 
@@ -40,15 +37,21 @@ http://127.0.0.1:8000
 
 ## Features
 
-- single-good comparison
-- custom basket mode with user weights
-- CPI and WPI percentage comparisons
-- rebased charts starting at `1`
-- separate price-vs-CPI and price-vs-WPI charts
-- interactive CPI group line chart
-- CPI groups relative to wages abundance bar chart
+- Individual bars and rankings for selected goods
+- Change in the price-to-wage ratio, with separate price and wage changes in bar tooltips
+- Custom dates and full-calendar-year quick ranges, limited to shared data
 
 ## Data sources
 
-- CPI workbook: `C:\RProjects\CIS_Marian\CPI GROUP data from 1948-Sept 2025 (EDITED).xlsx`
-- WPI workbook: `C:\Users\samfo\Downloads\WPI.xlsx`
+- [ABS CPI, December 2025, Table 18](https://www.abs.gov.au/statistics/economy/price-indexes-and-inflation/consumer-price-index-australia/dec-2025/6401018.xlsx): quarterly group, sub-group and expenditure class indexes, weighted average of eight capital cities. Bundled data includes 132 series (131 selectable series and overall CPI).
+- [ABS WPI, December 2025, Table 1](https://www.abs.gov.au/statistics/economy/price-indexes-and-inflation/wage-price-index-australia/dec-2025/634501.xlsx): series `A2603609J`, total hourly rates of pay excluding bonuses, private and public sectors, all industries, Australia, original. September 1997 to December 2025.
+
+These are static snapshots through Q4 2025, not an automatically updated feed.
+
+## Calculation and verification
+
+`((priceEnd / priceStart) / (wageEnd / wageStart) - 1) * 100`
+
+Negative values mean prices fell relative to wages; positive values mean prices rose relative to wages. The inverse ratio would measure the change in purchasing power and is a different percentage. Different reference bases for CPI and WPI cancel out because each index is divided by its own starting value. Each good is calculated separately; this is not a weighted household basket.
+
+Run `node --test tests/calculations.test.cjs` for the calculation and date-selection tests. Run `python tests/audit_sources.py path/to/6401018.xlsx path/to/634501.xlsx` (requires `openpyxl`) to compare every bundled observation with the linked ABS workbooks. See [AUDIT.md](AUDIT.md) for findings and scope.

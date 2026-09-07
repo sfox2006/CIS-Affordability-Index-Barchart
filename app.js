@@ -38,7 +38,7 @@ function getAvailableSeries() {
 }
 
 function formatQuarter(dateString) {
-  const date = new Date(`${dateString}T00:00:00`);
+  const date = new Date(`${dateString}T00:00:00Z`);
   const quarter = Math.floor(date.getUTCMonth() / 3) + 1;
   return `Q${quarter} ${date.getUTCFullYear()}`;
 }
@@ -80,6 +80,13 @@ function computePercentChange(startValue, endValue) {
   return ((endValue - startValue) / startValue) * 100;
 }
 
+function computeRelativePriceChange(priceStart, priceEnd, wageStart, wageEnd) {
+  if (![priceStart, priceEnd, wageStart, wageEnd].every((value) => Number.isFinite(value) && value > 0)) {
+    return null;
+  }
+  return ((priceEnd / priceStart) / (wageEnd / wageStart) - 1) * 100;
+}
+
 function fillSelect(select, options, formatter = (option) => option.label) {
   select.innerHTML = "";
   options.forEach((option) => {
@@ -99,6 +106,8 @@ function populateHorizonSelect() {
 }
 
 function populateDateSelects(sharedPoints) {
+  const previousStart = elements.startSelect.value;
+  const previousEnd = elements.endSelect.value;
   const options = sharedPoints.map((point) => ({
     value: point.date,
     label: formatQuarter(point.date),
@@ -108,8 +117,13 @@ function populateDateSelects(sharedPoints) {
   fillSelect(elements.endSelect, options);
 
   if (options.length) {
-    elements.startSelect.value = options[0].value;
-    elements.endSelect.value = options[options.length - 1].value;
+    elements.startSelect.value = options.find((option) => option.value >= previousStart)?.value || options[options.length - 1].value;
+    elements.endSelect.value = previousEnd
+      ? (options.filter((option) => option.value <= previousEnd).at(-1)?.value || options[0].value)
+      : options[options.length - 1].value;
+    if (elements.startSelect.value > elements.endSelect.value) {
+      elements.endSelect.value = elements.startSelect.value;
+    }
   }
 }
 
@@ -119,15 +133,10 @@ function applyQuickRange() {
   }
 
   const endIndex = state.sharedPoints.length - 1;
-  const quartersByHorizon = {
-    "1y": 4,
-    "3y": 12,
-    "5y": 20,
-    "10y": 40,
-    max: state.sharedPoints.length,
-  };
-  const periods = quartersByHorizon[elements.horizonSelect.value] ?? state.sharedPoints.length;
-  const startIndex = Math.max(0, endIndex - periods + 1);
+  const years = { "1y": 1, "3y": 3, "5y": 5, "10y": 10 }[elements.horizonSelect.value];
+  const endDate = state.sharedPoints[endIndex].date;
+  const targetStart = years ? `${Number(endDate.slice(0, 4)) - years}${endDate.slice(4)}` : state.sharedPoints[0].date;
+  const startIndex = state.sharedPoints.findIndex((point) => point.date >= targetStart);
 
   elements.startSelect.value = state.sharedPoints[startIndex].date;
   elements.endSelect.value = state.sharedPoints[endIndex].date;
@@ -138,9 +147,7 @@ function updateStatCards(filteredPoints) {
   const firstWpiPoint = wpiPoints[0];
   const lastWpiPoint = wpiPoints[wpiPoints.length - 1];
   const wpiAvailable = wpiPoints.length >= 2;
-  const selectedWpiWindowChange = wpiAvailable ? computePercentChange(firstWpiPoint.selectedValue, lastWpiPoint.selectedValue) : null;
-  const wpiChange = wpiAvailable ? computePercentChange(firstWpiPoint.wpiValue, lastWpiPoint.wpiValue) : null;
-  const gapWpi = wpiAvailable && Number.isFinite(selectedWpiWindowChange) && Number.isFinite(wpiChange) ? selectedWpiWindowChange - wpiChange : null;
+  const gapWpi = wpiAvailable ? computeRelativePriceChange(firstWpiPoint.selectedValue, lastWpiPoint.selectedValue, firstWpiPoint.wpiValue, lastWpiPoint.wpiValue) : null;
   const wpiRangeLabel = wpiAvailable ? `${formatQuarter(firstWpiPoint.date)} to ${formatQuarter(lastWpiPoint.date)}` : "";
 
   const heroStat = document.getElementById("hero-stat");
@@ -257,20 +264,14 @@ function getWpiComparisonRows(filteredPoints) {
   const firstPoint = filteredPoints[0];
   const lastPoint = filteredPoints[filteredPoints.length - 1];
   const wageChange = computePercentChange(firstPoint.wpiValue, lastPoint.wpiValue);
-  const withRelativeChange = (row) => ({
-    ...row,
-    relativeChange: Number.isFinite(row.priceChange) && Number.isFinite(row.wageChange)
-      ? row.priceChange - row.wageChange
-      : null,
-  });
-
   return getBasketSelections().map((item) => {
     const lookup = new Map(item.series.observations.map((point) => [point.date, point.value]));
-    return withRelativeChange({
+    return {
       label: item.series.label,
       priceChange: computePercentChange(lookup.get(firstPoint.date), lookup.get(lastPoint.date)),
       wageChange,
-    });
+      relativeChange: computeRelativePriceChange(lookup.get(firstPoint.date), lookup.get(lastPoint.date), firstPoint.wpiValue, lastPoint.wpiValue),
+    };
   })
     .filter((row) => Number.isFinite(row.relativeChange));
 }
@@ -285,7 +286,7 @@ function renderRankingList(rows) {
   const rankedRows = [...rows].sort((a, b) => a.relativeChange - b.relativeChange);
   elements.rankingList.innerHTML = rankedRows.map((row, index) => {
     const tone = row.relativeChange <= 0 ? "more" : "less";
-    const label = row.relativeChange <= 0 ? "more affordable" : "less affordable";
+    const label = row.relativeChange === 0 ? "unchanged" : row.relativeChange < 0 ? "more affordable" : "less affordable";
     return `
       <div class="ranking-row">
         <span class="ranking-index">${index + 1}</span>
@@ -323,7 +324,7 @@ function renderWpiComparisonChart(target, filteredPoints) {
 
   function barMarkup(row, value, y) {
     const x = value >= 0 ? zeroX : zeroX + value * scale;
-    const barWidth = Math.max(2, Math.abs(value * scale));
+    const barWidth = value === 0 ? 0 : Math.max(2, Math.abs(value * scale));
     const hasRoomInside = barWidth > 54;
     const valueX = value >= 0
       ? (hasRoomInside ? x + barWidth - 10 : x + barWidth + 8)
@@ -380,7 +381,7 @@ function renderWpiComparisonChart(target, filteredPoints) {
 
 function resetEmptyState(message) {
   elements.wpiChartTitle.textContent = "Waiting for a selection";
-  elements.wpiChartSubtitle.textContent = "Both series are rebased to 100 at the selected start date. Wage data follows the bundled WPI workbook.";
+  elements.wpiChartSubtitle.textContent = "Select a period with price and wage data.";
   elements.wpiChart.innerHTML = "";
   renderRankingList([]);
   elements.emptyState.textContent = message;
@@ -434,7 +435,7 @@ function buildBasketSeries() {
   }));
 
   const sharedDates = normalized.reduce((dates, item, index) => {
-    const itemDates = new Set(item.series.observations.map((point) => point.date));
+    const itemDates = new Set(item.series.observations.filter((point) => Number.isFinite(point.value) && point.value > 0).map((point) => point.date));
     if (index === 0) {
       return itemDates;
     }
@@ -449,7 +450,7 @@ function buildBasketSeries() {
     lookup: new Map(item.series.observations.map((point) => [point.date, point.value])),
   }));
 
-  const dates = [...sharedDates].filter((date) => cpiLookup.has(date)).sort();
+  const dates = [...sharedDates].filter((date) => cpiLookup.has(date) && Number.isFinite(wpiLookup.get(date)) && wpiLookup.get(date) > 0).sort();
   const points = dates.map((date) => ({
     date,
     selectedValue: seriesLookups.reduce((sum, item) => sum + item.lookup.get(date) * item.weight, 0),
@@ -473,20 +474,21 @@ function updateView() {
     (point) => point.date >= elements.startSelect.value && point.date <= elements.endSelect.value
   );
 
-  if (filteredPoints.length < 2) {
+  if (!filteredPoints.length) {
     resetEmptyState("Choose a wider date range. The current range does not have enough observations.");
     return;
   }
 
   const wpiPoints = filteredPoints.filter((point) => point.date >= WPI_START_DATE && Number.isFinite(point.wpiValue));
-  const wpiAvailable = wpiPoints.length >= 2;
+  const wpiAvailable = wpiPoints.length === filteredPoints.length && wpiPoints[0]?.date === elements.startSelect.value && wpiPoints.at(-1)?.date === elements.endSelect.value;
 
   elements.emptyState.textContent = "";
   updateStatCards(filteredPoints);
 
   if (wpiAvailable) {
+    elements.wpiChartTitle.textContent = "Selected goods: price change relative to wages";
     renderWpiComparisonChart(elements.wpiChart, wpiPoints);
-    elements.wpiChartSubtitle.textContent = `Each selected good is shown as price change minus wage growth (${formatQuarter(wpiPoints[0].date)} to ${formatQuarter(wpiPoints[wpiPoints.length - 1].date)}).`;
+    elements.wpiChartSubtitle.textContent = `Change in the price-to-wage ratio (${formatQuarter(wpiPoints[0].date)} to ${formatQuarter(wpiPoints[wpiPoints.length - 1].date)}).`;
   } else {
     elements.wpiChart.innerHTML = "";
     renderRankingList([]);
@@ -571,7 +573,7 @@ function updateBasketView() {
     applyQuickRange();
   }
   elements.wpiChartTitle.textContent = "Selected goods: price change relative to wages";
-  elements.wpiChartSubtitle.textContent = "Each selected basket item has one bar for price growth minus WPI wage growth.";
+  elements.wpiChartSubtitle.textContent = "Change in each good's price-to-wage ratio.";
   updateView();
 }
 

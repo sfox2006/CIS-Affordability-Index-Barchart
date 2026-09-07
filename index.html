@@ -830,10 +830,10 @@
           </div>
           <div class="chart-head-right">
             <button class="info-btn" type="button" data-info-toggle="wpi-chart-info" aria-label="Info">i</button>
-            <p id="wpi-chart-subtitle" class="chart-subtitle">Price growth minus WPI wage growth.</p>
+            <p id="wpi-chart-subtitle" class="chart-subtitle">Change in the price-to-wage ratio.</p>
           </div>
         </div>
-        <div id="wpi-chart-info" class="info-popover">If inflation for the selected good is higher than wage growth, it became less affordable relative to wages. Wage data follows the bundled WPI workbook.</div>
+        <div id="wpi-chart-info" class="info-popover">The percentage change is [(end price index / start price index) / (end wage index / start wage index) - 1] &times; 100. Negative values mean a lower price relative to wages; positive values mean a higher price relative to wages. Both indexes use the same selected quarters. Wages are ABS total hourly rates of pay excluding bonuses, all industries, private and public sectors, original series. <a href="https://www.abs.gov.au/statistics/economy/price-indexes-and-inflation/consumer-price-index-australia/dec-2025">CPI Table 18</a>; <a href="https://www.abs.gov.au/statistics/economy/price-indexes-and-inflation/wage-price-index-australia/dec-2025">WPI Table 1</a>. Bundled data through Q4 2025.</div>
 <div class="chart-frame" id="wpi-chart-frame">
           <svg id="wpi-chart" viewBox="0 0 920 420" role="img" aria-label="Bar chart: price change relative to wages"></svg>
           <div class="chart-tooltip" id="wpi-tooltip"></div>
@@ -862,8 +862,8 @@
     </div>
   </div>
 
-  <script src="data.js?v=3"></script>
-  <script src="app.js?v=3"></script>
+  <script src="data.js?v=4"></script>
+  <script src="app.js?v=4"></script>
 
   <script>
   const TWEAK_DEFAULTS = { theme: "theme-light" };
