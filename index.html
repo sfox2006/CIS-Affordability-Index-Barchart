@@ -792,7 +792,7 @@
       <!-- Explainer -->
       <div class="basket-explainer">
         <div class="basket-explainer-icon">i</div>
-        <p>Add goods or categories, then compare each one by price change relative to wage growth. Each selected item appears as its own bar below.</p>
+        <p>Compare the percentage change in how much of each good or category wages can buy.</p>
       </div>
 
       <!-- Column headers -->
@@ -825,17 +825,17 @@
         </div>
         <div class="chart-header">
           <div>
-            <p class="eyebrow"><span class="eyebrow-dot"></span> Relative to wages</p>
+            <p class="eyebrow"><span class="eyebrow-dot"></span> Affordability</p>
             <h2 id="wpi-chart-title" class="chart-title">Waiting for a selection</h2>
           </div>
           <div class="chart-head-right">
             <button class="info-btn" type="button" data-info-toggle="wpi-chart-info" aria-label="Info">i</button>
-            <p id="wpi-chart-subtitle" class="chart-subtitle">Change in the price-to-wage ratio.</p>
+            <p id="wpi-chart-subtitle" class="chart-subtitle">Percentage change in how much wages can buy.</p>
           </div>
         </div>
-        <div id="wpi-chart-info" class="info-popover">The percentage change is [(end price index / start price index) / (end wage index / start wage index) - 1] &times; 100. Negative values mean a lower price relative to wages; positive values mean a higher price relative to wages. Both indexes use the same selected quarters. Wages are ABS total hourly rates of pay excluding bonuses, all industries, private and public sectors, original series. <a href="https://www.abs.gov.au/statistics/economy/price-indexes-and-inflation/consumer-price-index-australia/dec-2025">CPI Table 18</a>; <a href="https://www.abs.gov.au/statistics/economy/price-indexes-and-inflation/wage-price-index-australia/dec-2025">WPI Table 1</a>. Bundled data through Q4 2025.</div>
+        <div id="wpi-chart-info" class="info-popover">The percentage change in affordability is [(end wage index / start wage index) / (end price index / start price index) - 1] &times; 100. A positive 20% means wages can buy 20% more of the good; a negative 20% means wages can buy 20% less. Both indexes use the same selected quarters. Wages are ABS total hourly rates of pay excluding bonuses, all industries, private and public sectors, original series. <a href="https://www.abs.gov.au/statistics/economy/price-indexes-and-inflation/consumer-price-index-australia/dec-2025">CPI Table 18</a>; <a href="https://www.abs.gov.au/statistics/economy/price-indexes-and-inflation/wage-price-index-australia/dec-2025">WPI Table 1</a>. Bundled data through Q4 2025.</div>
 <div class="chart-frame" id="wpi-chart-frame">
-          <svg id="wpi-chart" viewBox="0 0 920 420" role="img" aria-label="Bar chart: price change relative to wages"></svg>
+          <svg id="wpi-chart" viewBox="0 0 920 420" role="img" aria-label="Bar chart: percentage change in affordability"></svg>
           <div class="chart-tooltip" id="wpi-tooltip"></div>
         </div>
         <div class="ranking-panel" aria-labelledby="ranking-title">
@@ -863,7 +863,7 @@
   </div>
 
   <script src="data.js?v=4"></script>
-  <script src="app.js?v=4"></script>
+  <script src="app.js?v=5"></script>
 
   <script>
   const TWEAK_DEFAULTS = { theme: "theme-light" };

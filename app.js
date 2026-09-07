@@ -80,11 +80,11 @@ function computePercentChange(startValue, endValue) {
   return ((endValue - startValue) / startValue) * 100;
 }
 
-function computeRelativePriceChange(priceStart, priceEnd, wageStart, wageEnd) {
+function computeAffordabilityChange(priceStart, priceEnd, wageStart, wageEnd) {
   if (![priceStart, priceEnd, wageStart, wageEnd].every((value) => Number.isFinite(value) && value > 0)) {
     return null;
   }
-  return ((priceEnd / priceStart) / (wageEnd / wageStart) - 1) * 100;
+  return ((wageEnd / wageStart) / (priceEnd / priceStart) - 1) * 100;
 }
 
 function fillSelect(select, options, formatter = (option) => option.label) {
@@ -147,7 +147,7 @@ function updateStatCards(filteredPoints) {
   const firstWpiPoint = wpiPoints[0];
   const lastWpiPoint = wpiPoints[wpiPoints.length - 1];
   const wpiAvailable = wpiPoints.length >= 2;
-  const gapWpi = wpiAvailable ? computeRelativePriceChange(firstWpiPoint.selectedValue, lastWpiPoint.selectedValue, firstWpiPoint.wpiValue, lastWpiPoint.wpiValue) : null;
+  const gapWpi = wpiAvailable ? computeAffordabilityChange(firstWpiPoint.selectedValue, lastWpiPoint.selectedValue, firstWpiPoint.wpiValue, lastWpiPoint.wpiValue) : null;
   const wpiRangeLabel = wpiAvailable ? `${formatQuarter(firstWpiPoint.date)} to ${formatQuarter(lastWpiPoint.date)}` : "";
 
   const heroStat = document.getElementById("hero-stat");
@@ -161,7 +161,7 @@ function updateStatCards(filteredPoints) {
   }
 
   if (wpiAvailable) {
-    if (heroStat) setMetricTone(heroStat, gapWpi, true);
+    if (heroStat) setMetricTone(heroStat, gapWpi);
   } else {
     if (heroStat) heroStat.classList.add("metric-neutral");
   }
@@ -270,7 +270,7 @@ function getWpiComparisonRows(filteredPoints) {
       label: item.series.label,
       priceChange: computePercentChange(lookup.get(firstPoint.date), lookup.get(lastPoint.date)),
       wageChange,
-      relativeChange: computeRelativePriceChange(lookup.get(firstPoint.date), lookup.get(lastPoint.date), firstPoint.wpiValue, lastPoint.wpiValue),
+      relativeChange: computeAffordabilityChange(lookup.get(firstPoint.date), lookup.get(lastPoint.date), firstPoint.wpiValue, lastPoint.wpiValue),
     };
   })
     .filter((row) => Number.isFinite(row.relativeChange));
@@ -283,10 +283,10 @@ function renderRankingList(rows) {
     return;
   }
 
-  const rankedRows = [...rows].sort((a, b) => a.relativeChange - b.relativeChange);
+  const rankedRows = [...rows].sort((a, b) => b.relativeChange - a.relativeChange);
   elements.rankingList.innerHTML = rankedRows.map((row, index) => {
-    const tone = row.relativeChange <= 0 ? "more" : "less";
-    const label = row.relativeChange === 0 ? "unchanged" : row.relativeChange < 0 ? "more affordable" : "less affordable";
+    const tone = row.relativeChange >= 0 ? "more" : "less";
+    const label = row.relativeChange === 0 ? "unchanged" : row.relativeChange > 0 ? "more affordable" : "less affordable";
     return `
       <div class="ranking-row">
         <span class="ranking-index">${index + 1}</span>
@@ -334,13 +334,13 @@ function renderWpiComparisonChart(target, filteredPoints) {
       : (hasRoomInside ? "start" : "end");
     const valueClass = hasRoomInside ? "comparison-value-label comparison-value-label-inside" : "comparison-value-label";
     const verdict = value > 0
-      ? "less affordable relative to wages"
+      ? "wages buy more"
       : value < 0
-        ? "more affordable relative to wages"
+        ? "wages buy less"
         : "unchanged relative to wages";
     return `
-      <rect class="${value > 0 ? "comparison-bar-price" : "comparison-bar-wage"}" x="${x.toFixed(2)}" y="${y}" width="${barWidth.toFixed(2)}" height="24" rx="5">
-        <title>${escapeHtml(row.label)}: ${formatPercent(value)} relative to wages (${verdict}). Price change: ${formatPercent(row.priceChange)}. Wage growth: ${formatPercent(row.wageChange)}.</title>
+      <rect class="${value < 0 ? "comparison-bar-price" : "comparison-bar-wage"}" x="${x.toFixed(2)}" y="${y}" width="${barWidth.toFixed(2)}" height="24" rx="5">
+        <title>${escapeHtml(row.label)}: ${formatPercent(value)} change in affordability (${verdict}). Price change: ${formatPercent(row.priceChange)}. Wage growth: ${formatPercent(row.wageChange)}.</title>
       </rect>
       <text class="${valueClass}" x="${valueX.toFixed(2)}" y="${y + 17}" text-anchor="${anchor}">${formatPercent(value)}</text>
     `;
@@ -365,7 +365,7 @@ function renderWpiComparisonChart(target, filteredPoints) {
 
   target.innerHTML = `
     <text class="comparison-heading" x="28" y="30">Good</text>
-    <text class="comparison-heading" x="${plotLeft}" y="30">Price change relative to wages</text>
+    <text class="comparison-heading" x="${plotLeft}" y="30">Change in affordability (%)</text>
     <g class="comparison-key" transform="translate(${plotLeft}, 50)">
       <rect class="comparison-bar-wage" x="0" y="-11" width="16" height="10" rx="2"></rect>
       <text class="comparison-key-label" x="23" y="-2">More affordable</text>
@@ -486,9 +486,9 @@ function updateView() {
   updateStatCards(filteredPoints);
 
   if (wpiAvailable) {
-    elements.wpiChartTitle.textContent = "Selected goods: price change relative to wages";
+    elements.wpiChartTitle.textContent = "Selected goods: change in affordability";
     renderWpiComparisonChart(elements.wpiChart, wpiPoints);
-    elements.wpiChartSubtitle.textContent = `Change in the price-to-wage ratio (${formatQuarter(wpiPoints[0].date)} to ${formatQuarter(wpiPoints[wpiPoints.length - 1].date)}).`;
+    elements.wpiChartSubtitle.textContent = `Change in how much wages can buy (${formatQuarter(wpiPoints[0].date)} to ${formatQuarter(wpiPoints[wpiPoints.length - 1].date)}).`;
   } else {
     elements.wpiChart.innerHTML = "";
     renderRankingList([]);
@@ -572,8 +572,8 @@ function updateBasketView() {
   if (elements.horizonSelect.value !== "custom") {
     applyQuickRange();
   }
-  elements.wpiChartTitle.textContent = "Selected goods: price change relative to wages";
-  elements.wpiChartSubtitle.textContent = "Change in each good's price-to-wage ratio.";
+  elements.wpiChartTitle.textContent = "Selected goods: change in affordability";
+  elements.wpiChartSubtitle.textContent = "Percentage change in how much wages can buy.";
   updateView();
 }
 

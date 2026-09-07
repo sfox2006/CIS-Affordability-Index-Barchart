@@ -4,7 +4,7 @@ Audited 7 September 2026 against the live GitHub Pages application and ABS Decem
 
 ## Findings corrected
 
-1. The live bar chart subtracted percentage wage growth from percentage price growth and labelled the result as a percent change relative to wages. That is a percentage-point gap, not a ratio change. Replaced it with `((P1/P0)/(W1/W0)-1)*100` for bars and rankings.
+1. The original live bar chart subtracted percentage wage growth from percentage price growth. The final metric follows the user's Affordability Change Metric - Index Version document: `((W1/W0)/(P1/P0)-1)*100`, measuring the percentage change in how much wages can buy. Positive values are improvements (green), negative values are declines (red), and rankings place the largest improvements first.
 2. The end-quarter control offered Q4 2025 while bundled wages ended in Q1 2025. The chart silently used Q1 instead. Added the verified Q2, Q3 and Q4 2025 original WPI values (156.2, 158.3, 159.4). Date options now require valid observations for every selected good and wages; rendering rejects mismatched endpoints.
 3. Quick ranges counted observations rather than elapsed quarters. For example, the one-year range spanned three quarters. Ranges now use calendar-year offsets.
 4. Adding, removing or changing goods reset custom dates to the maximum history. Valid custom dates are now retained; dates outside a new good's history are clamped to available dates, visibly in both controls.
@@ -21,9 +21,9 @@ Audited 7 September 2026 against the live GitHub Pages application and ABS Decem
 
 ## Verification
 
-The regression suite compares 834,993 combinations of selectable good and start/end quarters against an independently expressed change in price divided by wage levels. It also covers known arithmetic examples, invalid values, reference-base invariance, custom-date persistence, full-year ranges, missing wage endpoints, shorter good histories and same-quarter comparisons. The source audit independently checks every bundled observation against the downloaded workbooks.
+The regression suite compares 834,993 combinations of selectable good and start/end quarters against an independently expressed change in wage divided by price levels. It also covers both reference-document examples, chart colours and ranking direction, invalid values, reference-base invariance, custom-date persistence, full-year ranges, missing wage endpoints, shorter good histories and same-quarter comparisons. The source audit independently checks every bundled observation against the downloaded workbooks.
 
-Example: price index 100 to 120 and wage index 100 to 110 gives `(1.20/1.10-1)*100 = 9.0909%`, not a 10% change. Negative results indicate a lower price relative to hourly wages, not an equal-sized increase in purchasing power.
+Reference-document examples: milk prices 100 to 160 and wages 100 to 130 give `(1.30/1.60-1)*100 = -18.75%`: wages buy 18.75% less milk. Bread prices 100 to 120 and wages 100 to 150 give `(1.50/1.20-1)*100 = +25%`: wages buy 25% more bread. This is the inverse of the price-relative-to-wages growth factor, not simply a sign reversal of that percentage change.
 
 ## Scope and limitations
 

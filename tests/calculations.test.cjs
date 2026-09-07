@@ -29,15 +29,18 @@ function close(actual, expected) {
 
 test('ratio uses growth factors and is independent of index reference bases', () => {
   const { run } = app();
-  close(run('computeRelativePriceChange(100, 120, 100, 110)'), 9.090909090909);
-  close(run('computeRelativePriceChange(100, 80, 100, 200)'), -60);
-  close(run('computeRelativePriceChange(100, 200, 100, 200)'), 0);
-  close(run('computeRelativePriceChange(25, 30, 300, 330)'), 9.090909090909);
+  close(run('computeAffordabilityChange(100, 120, 100, 110)'), -8.333333333333);
+  close(run('computeAffordabilityChange(100, 80, 100, 200)'), 150);
+  close(run('computeAffordabilityChange(100, 200, 100, 200)'), 0);
+  close(run('computeAffordabilityChange(25, 30, 300, 330)'), -8.333333333333);
+  // Reference document examples: milk and bread.
+  close(run('computeAffordabilityChange(100, 160, 100, 130)'), -18.75);
+  close(run('computeAffordabilityChange(100, 120, 100, 150)'), 25);
   for (const value of ['0', '-1', 'null', 'undefined', 'NaN', 'Infinity']) {
     for (let position = 0; position < 4; position++) {
       const args = ['100', '120', '100', '110'];
       args[position] = value;
-      assert.equal(run(`computeRelativePriceChange(${args.join(',')})`), null);
+      assert.equal(run(`computeAffordabilityChange(${args.join(',')})`), null);
     }
   }
 });
@@ -53,8 +56,8 @@ test('all bundled goods and endpoint pairs agree with independently computed pri
       for (let i = 0; i < points.length; i++) {
         for (let j = i; j < points.length; j++) {
           const first = points[i], last = points[j];
-          const expected = ((last.selectedValue / wages.get(last.date)) /
-            (first.selectedValue / wages.get(first.date)) - 1) * 100;
+          const expected = ((wages.get(last.date) / last.selectedValue) /
+            (wages.get(first.date) / first.selectedValue) - 1) * 100;
           const result = getWpiComparisonRows([first, last])[0];
           if (!result || Math.abs(result.relativeChange - expected) > 1e-9) {
             throw new Error(series.label + ': ' + first.date + ' to ' + last.date);
@@ -107,4 +110,20 @@ test('same quarter is zero and chart labels stay correct across time zones', () 
   assert.match(nodes.get('ranking-list').innerHTML, /0.0% \(unchanged\)/);
   assert.equal(run('formatQuarter("2020-03-01")'), 'Q1 2020');
   assert.equal(run('formatQuarter("2020-12-01")'), 'Q4 2020');
+});
+
+test('affordability gains rank first and gains/losses use green/red bars', () => {
+  const { run, nodes } = app();
+  run(`getWpiComparisonRows = () => [
+    {label: 'Milk', priceChange: 60, wageChange: 30, relativeChange: -18.75},
+    {label: 'Bread', priceChange: 20, wageChange: 50, relativeChange: 25}
+  ]; renderWpiComparisonChart(elements.wpiChart, []);`);
+  const ranking = nodes.get('ranking-list').innerHTML;
+  assert.ok(ranking.indexOf('Bread') < ranking.indexOf('Milk'));
+  assert.match(ranking, /ranking-value more[^>]*>\+25.0% \(more affordable\)/);
+  assert.match(ranking, /ranking-value less[^>]*>-18.8% \(less affordable\)/);
+  const chart = nodes.get('wpi-chart').innerHTML;
+  assert.match(chart, /<rect class="comparison-bar-price"[^>]*>\s*<title>Milk:/);
+  assert.match(chart, /<rect class="comparison-bar-wage"[^>]*>\s*<title>Bread:/);
+  assert.match(chart, /change in affordability \(wages buy more\)/);
 });

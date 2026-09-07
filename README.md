@@ -38,7 +38,7 @@ http://127.0.0.1:8000
 ## Features
 
 - Individual bars and rankings for selected goods
-- Change in the price-to-wage ratio, with separate price and wage changes in bar tooltips
+- Percentage change in affordability (how much wages can buy), with separate price and wage changes in bar tooltips
 - Custom dates and full-calendar-year quick ranges, limited to shared data
 
 ## Data sources
@@ -50,8 +50,8 @@ These are static snapshots through Q4 2025, not an automatically updated feed.
 
 ## Calculation and verification
 
-`((priceEnd / priceStart) / (wageEnd / wageStart) - 1) * 100`
+`((wageEnd / wageStart) / (priceEnd / priceStart) - 1) * 100`
 
-Negative values mean prices fell relative to wages; positive values mean prices rose relative to wages. The inverse ratio would measure the change in purchasing power and is a different percentage. Different reference bases for CPI and WPI cancel out because each index is divided by its own starting value. Each good is calculated separately; this is not a weighted household basket.
+Positive values mean wages can buy more of the good; negative values mean wages can buy less. This follows the supplied Affordability Change Metric - Index Version document. For example, wages rising 50% and prices rising 20% gives a 25% increase in affordability. Gains appear green, losses red, and rankings put the largest gains first. Different reference bases for CPI and WPI cancel out because each index is divided by its own starting value. Each good is calculated separately; this is not a weighted household basket.
 
 Run `node --test tests/calculations.test.cjs` for the calculation and date-selection tests. Run `python tests/audit_sources.py path/to/6401018.xlsx path/to/634501.xlsx` (requires `openpyxl`) to compare every bundled observation with the linked ABS workbooks. See [AUDIT.md](AUDIT.md) for findings and scope.
