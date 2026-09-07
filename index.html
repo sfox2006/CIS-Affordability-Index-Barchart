@@ -447,6 +447,11 @@
       font-size: 0.81rem; color: var(--muted); line-height: 1.55;
     }
     .info-popover.is-open { display: block; }
+    .annotation-dialog { width: min(420px, calc(100% - 32px)); border: 1px solid var(--line); border-radius: 8px; padding: 24px; background: var(--surface); color: var(--ink); }
+    .annotation-dialog::backdrop { background: rgba(0,0,0,0.3); }
+    .annotation-dialog textarea { display: block; width: 100%; box-sizing: border-box; margin: 12px 0; font: inherit; }
+    .annotation-dialog button { padding: 8px 16px; cursor: pointer; }
+    #chart-notes { color: var(--muted); font-size: 0.85rem; overflow-wrap: anywhere; }
     .methodology-note { margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--line); color: var(--muted); font-size: 0.81rem; line-height: 1.6; }
     .methodology-note h2 { font-size: 1rem; color: var(--ink); margin: 0 0 8px; }
     .methodology-note p { margin: 0; }
@@ -828,6 +833,7 @@
           <div class="ranking-list" id="ranking-list"></div>
         </div>
         <p id="empty-state" class="empty-state">Pick a good or group to draw the comparison.</p>
+        <ol id="chart-notes" aria-label="Chart notes"></ol>
       </article>
 
     </section>
@@ -838,6 +844,15 @@
     </section>
   </main>
 
+  <dialog id="annotation-dialog" class="annotation-dialog" aria-labelledby="annotation-title">
+    <form id="annotation-form">
+      <h2 id="annotation-title">Add annotation</h2>
+      <label for="annotation-text">Note</label>
+      <textarea id="annotation-text" rows="3" maxlength="300" required></textarea>
+      <button type="button" id="annotation-cancel">Cancel</button>
+      <button type="submit">Add note</button>
+    </form>
+  </dialog>
   <!-- TWEAKS PANEL -->
   <div class="tweaks-panel" id="tweaks-panel">
     <div class="tweaks-title">Tweaks</div>
@@ -961,69 +976,88 @@
       alert("No chart to download yet.");
       return;
     }
-    const serializer = new XMLSerializer();
-    const source = '<?xml version="1.0" standalone="no"?>\n' +
-      serializer.serializeToString(svg).replace("<svg", '<svg xmlns="http://www.w3.org/2000/svg" style="background:#f7faf8;font-family:sans-serif"');
+    const copy = svg.cloneNode(true);
+    const width = svg.viewBox.baseVal.width;
+    let height = svg.viewBox.baseVal.height;
+    // Preserve stylesheet-driven labels and colours in the standalone image.
+    const originals = [svg, ...svg.querySelectorAll("*")];
+    [copy, ...copy.querySelectorAll("*")].forEach((node, index) => {
+      const style = getComputedStyle(originals[index]);
+      for (const property of ["fill", "stroke", "stroke-width", "font-family", "font-size", "font-weight", "text-anchor", "dominant-baseline", "opacity"]) {
+        node.style.setProperty(property, style.getPropertyValue(property));
+      }
+    });
+    document.querySelectorAll("#chart-notes li").forEach((note, index) => {
+      const lines = (String(index + 1) + ". " + note.textContent).match(/.{1,90}(?:\s|$)|.{1,90}/g) || [];
+      lines.forEach((line) => {
+        height += 22;
+        const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        label.setAttribute("x", "20");
+        label.setAttribute("y", String(height));
+        label.setAttribute("fill", "#263d38");
+        label.setAttribute("font-size", "14");
+        label.textContent = line;
+        copy.appendChild(label);
+      });
+    });
+    height += 16;
+    copy.setAttribute("viewBox", `0 0 ${width} ${height}`);
+    copy.setAttribute("width", String(width));
+    copy.setAttribute("height", String(height));
+    const source = new XMLSerializer().serializeToString(copy);
     const blob = new Blob([source], { type: "image/svg+xml" });
     const url = URL.createObjectURL(blob);
     const image = new Image();
     image.onload = () => {
+      try {
       const scale = 2;
       const canvas = document.createElement("canvas");
-      canvas.width = svg.viewBox.baseVal.width * scale;
-      canvas.height = svg.viewBox.baseVal.height * scale;
+      canvas.width = width * scale;
+      canvas.height = height * scale;
       const context = canvas.getContext("2d");
       context.fillStyle = "#f7faf8";
       context.fillRect(0, 0, canvas.width, canvas.height);
       context.scale(scale, scale);
       context.drawImage(image, 0, 0);
-      URL.revokeObjectURL(url);
       const link = document.createElement("a");
       link.download = filename + ".png";
       link.href = canvas.toDataURL("image/png");
+      document.body.appendChild(link);
       link.click();
+      link.remove();
+      } catch (error) {
+        alert("The chart could not be downloaded. Please try opening the website in your usual browser.");
+      } finally {
+        URL.revokeObjectURL(url);
+      }
+    };
+    image.onerror = () => {
+      URL.revokeObjectURL(url);
+      alert("The chart image could not be created. Please try again.");
     };
     image.src = url;
   }
 
   document.getElementById("dl-btn-wpi")?.addEventListener("click", () => downloadChartPng("wpi-chart", "cis-price-vs-wpi"));
 
-  let annoMode = false;
-  let annoCount = 0;
+  const annotationDialog = document.getElementById("annotation-dialog");
+  const annotationText = document.getElementById("annotation-text");
   function setupWpiAnnotation() {
-    const frame = document.getElementById("wpi-chart-frame");
-    const button = document.getElementById("anno-btn-wpi");
-    if (!frame || !button) return;
-    annoMode = !annoMode;
-    button.classList.toggle("active", annoMode);
-    frame.style.cursor = annoMode ? "crosshair" : "";
+    annotationText.value = "";
+    annotationDialog.showModal();
+    annotationText.focus();
   }
 
   document.getElementById("anno-btn-wpi")?.addEventListener("click", setupWpiAnnotation);
-  document.getElementById("wpi-chart-frame")?.addEventListener("click", (event) => {
-    if (!annoMode) return;
-    const frame = event.currentTarget;
-    const rect = frame.getBoundingClientRect();
-    const px = event.clientX - rect.left;
-    const py = event.clientY - rect.top;
-    const note = prompt("Add a note");
+  document.getElementById("annotation-cancel").addEventListener("click", () => annotationDialog.close());
+  document.getElementById("annotation-form").addEventListener("submit", (event) => {
+    event.preventDefault();
+    const note = annotationText.value.trim();
     if (!note) return;
-    annoCount += 1;
-    const marker = document.createElement("button");
-    marker.className = "anno-marker";
-    marker.type = "button";
-    marker.textContent = annoCount;
-    marker.style.left = px + "px";
-    marker.style.top = py + "px";
-    marker.title = note;
-    marker.addEventListener("click", (markerEvent) => {
-      markerEvent.stopPropagation();
-      alert("Note " + annoCount + ": " + note);
-    });
-    frame.appendChild(marker);
-    annoMode = false;
-    document.getElementById("anno-btn-wpi")?.classList.remove("active");
-    frame.style.cursor = "";
+    const item = document.createElement("li");
+    item.textContent = note;
+    document.getElementById("chart-notes").appendChild(item);
+    annotationDialog.close();
   });
 
   window.addEventListener("load", () => {
