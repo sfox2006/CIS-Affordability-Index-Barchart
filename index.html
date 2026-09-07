@@ -97,6 +97,8 @@
       min-height: 100vh;
       transition: background 0.35s, color 0.35s;
     }
+    /* Measure content, not the iframe viewport, so embeds can also shrink. */
+    body.cis-auto-height { min-height: 0; display: flow-root; }
 
     /* Section */
     .nav {
@@ -868,6 +870,7 @@
 
   <script src="data.js?v=5"></script>
   <script src="app.js?v=5"></script>
+  <script src="embed-frame.js?v=1"></script>
 
   <script>
   const TWEAK_DEFAULTS = { theme: "theme-light" };

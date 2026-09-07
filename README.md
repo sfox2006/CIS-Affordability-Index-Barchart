@@ -6,6 +6,12 @@ Static website comparing each selected CPI good or goods group with the Wage Pri
 
 The front end now runs as a static site using the bundled `data.js` file, so the main comparison interface can be hosted on GitHub Pages without `server.py`.
 
+## Embed on WordPress without nested scrolling
+
+Replace the existing GitHub iframe with the complete contents of `GITHUB-EMBED.html` in a Custom HTML block or Elementor HTML widget. The external `embed.js` script must be permitted to run on the WordPress page. It listens only to the expected GitHub origin and matching iframe, then adjusts the height as content changes. The calculator's `embed-frame.js` reports its content height to its embedding parent. Both parts are required; updating GitHub alone cannot resize an iframe on the host page.
+
+Test the saved page on desktop and mobile, including adding and removing several goods, opening information, and adding notes. The only vertical scrollbar should be the WordPress page's scrollbar. Keep the containing Elementor section/widget height automatic, with no fixed height or scrolling overflow. Do not hide overflow as a substitute for resizing. If WordPress removes the script, an administrator must load it using the site's approved script mechanism. Without it the iframe remains scrollable, so content is not cut off. GitHub still uses a static ABS data snapshot.
+
 ## Run locally
 
 Static front end:

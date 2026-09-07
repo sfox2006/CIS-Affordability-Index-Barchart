@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Affordability embed test</title>
+  <style>
+    body { margin: 0; font: 16px sans-serif; background: #fff; color: #193f36; }
+    header, footer { padding: 24px; border-block: 1px solid #ccc; }
+    main { width: min(1200px, 100%); margin: auto; }
+    .mobile { width: min(375px, 100%); }
+    h2 { margin: 24px 16px; font-size: 20px; }
+  </style>
+</head>
+<body>
+  <header>Affordability embed test</header>
+  <main>
+    <h2>Desktop embed</h2>
+    <iframe data-cis-affordability-github title="Desktop calculator" src="https://sfox2006.github.io/CIS-Affordability-Index-Barchart/?embed=1" width="100%" height="1400" style="display:block;width:100%;border:0;"></iframe>
+    <h2>Mobile-width embed</h2>
+    <div class="mobile">
+      <iframe data-cis-affordability-github title="Mobile calculator" src="https://sfox2006.github.io/CIS-Affordability-Index-Barchart/?embed=1" width="100%" height="1400" style="display:block;width:100%;border:0;"></iframe>
+    </div>
+  </main>
+  <footer>End of embedding page</footer>
+  <script src="../embed.js?v=1" defer></script>
+</body>
+</html>
