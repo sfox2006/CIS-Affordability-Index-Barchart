@@ -77,8 +77,8 @@ test('quick ranges cover full calendar years and selections preserve custom date
   for (const years of [1, 3, 5, 10]) {
     nodes.get('time-horizon-search').value = `${years}y`;
     run('applyQuickRange()');
-    assert.equal(nodes.get('start-date-search').value, `${2025 - years}-12-01`);
-    assert.equal(nodes.get('end-date-search').value, '2025-12-01');
+    assert.equal(nodes.get('start-date-search').value, `${2026 - years}-06-01`);
+    assert.equal(nodes.get('end-date-search').value, '2026-06-01');
   }
   nodes.get('time-horizon-search').value = 'custom';
   nodes.get('start-date-search').value = '2015-06-01';
@@ -92,8 +92,8 @@ test('quick ranges cover full calendar years and selections preserve custom date
 test('missing wages and shorter goods histories cannot silently change chart endpoints', () => {
   const { run, nodes } = app();
   run(`WPI_DATA.pop(); updateBasketView()`);
-  assert.equal(nodes.get('end-date-search').value, '2025-09-01');
-  nodes.get('end-date-search').value = '2025-12-01';
+  assert.equal(nodes.get('end-date-search').value, '2026-03-01');
+  nodes.get('end-date-search').value = '2026-06-01';
   run('updateView()');
   assert.equal(nodes.get('wpi-chart').innerHTML, '');
   run(`state.basketRows = [{id: 1, seriesId: getAvailableSeries()[0].seriesId}];

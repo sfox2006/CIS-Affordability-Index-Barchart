@@ -43,10 +43,10 @@ http://127.0.0.1:8000
 
 ## Data sources
 
-- [ABS CPI, December 2025, Table 18](https://www.abs.gov.au/statistics/economy/price-indexes-and-inflation/consumer-price-index-australia/dec-2025/6401018.xlsx): quarterly group, sub-group and expenditure class indexes, weighted average of eight capital cities. Bundled data includes 132 series (131 selectable series and overall CPI).
-- [ABS WPI, December 2025, Table 1](https://www.abs.gov.au/statistics/economy/price-indexes-and-inflation/wage-price-index-australia/dec-2025/634501.xlsx): series `A2603609J`, total hourly rates of pay excluding bonuses, private and public sectors, all industries, Australia, original. September 1997 to December 2025.
+- [ABS CPI, July 2026, Table 18](https://www.abs.gov.au/statistics/economy/price-indexes-and-inflation/consumer-price-index-australia/jul-2026/6401018.xlsx): quarterly group, sub-group and expenditure class indexes, weighted average of eight capital cities. Bundled data includes 132 series (131 selectable series and overall CPI), through Q2 2026.
+- [ABS WPI, June 2026, Table 1](https://www.abs.gov.au/statistics/economy/price-indexes-and-inflation/wage-price-index-australia/jun-2026/634501.xlsx): series `A2603609J`, total hourly rates of pay excluding bonuses, private and public sectors, all industries, Australia, original. September 1997 to June 2026.
 
-These are static snapshots through Q4 2025, not an automatically updated feed.
+These are static snapshots through Q2 2026, not an automatically updated feed. The original website now uses the same verified snapshot as the WordPress plugin package.
 
 ## Calculation and verification
 

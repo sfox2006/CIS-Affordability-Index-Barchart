@@ -1,5 +1,7 @@
 # Calculation and source audit
 
+Update: the original website now contains the verified Q2 2026 dataset from the WordPress package: 22,813 CPI observations and 116 WPI observations. Sources are July 2026 CPI Table 18 and June 2026 WPI Table 1. All 864,766 available good/period comparisons were checked after the refresh. The December 2025 findings below describe the earlier audit snapshot.
+
 Audited 7 September 2026 against the live GitHub Pages application and ABS December 2025 workbooks.
 
 ## Findings corrected
