@@ -447,6 +447,9 @@
       font-size: 0.81rem; color: var(--muted); line-height: 1.55;
     }
     .info-popover.is-open { display: block; }
+    .methodology-note { margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--line); color: var(--muted); font-size: 0.81rem; line-height: 1.6; }
+    .methodology-note h2 { font-size: 1rem; color: var(--ink); margin: 0 0 8px; }
+    .methodology-note p { margin: 0; }
 
     /* Section */
     .metric-positive { color: var(--bad) !important; }
@@ -815,7 +818,7 @@
             <p id="wpi-chart-subtitle" class="chart-subtitle">Percentage change in how much wages can buy.</p>
           </div>
         </div>
-        <div id="wpi-chart-info" class="info-popover">The percentage change in affordability is [(end wage index / start wage index) / (end price index / start price index) - 1] &times; 100. A positive 20% means wages can buy 20% more of the good; a negative 20% means wages can buy 20% less. Both indexes use the same selected quarters. Wages are ABS total hourly rates of pay excluding bonuses, all industries, private and public sectors, original series. <a href="https://www.abs.gov.au/statistics/economy/price-indexes-and-inflation/consumer-price-index-australia/jul-2026">CPI Table 18</a>; <a href="https://www.abs.gov.au/statistics/economy/price-indexes-and-inflation/wage-price-index-australia/jun-2026">WPI Table 1</a>. Bundled data through Q2 2026.</div>
+        <div id="wpi-chart-info" class="info-popover">A positive 20% means wages can buy 20% more of the good; a negative 20% means wages can buy 20% less.</div>
 <div class="chart-frame" id="wpi-chart-frame">
           <svg id="wpi-chart" viewBox="0 0 920 420" role="img" aria-label="Bar chart: percentage change in affordability"></svg>
           <div class="chart-tooltip" id="wpi-tooltip"></div>
@@ -829,6 +832,10 @@
 
     </section>
 
+    <section class="methodology-note" aria-labelledby="methodology-title">
+      <h2 id="methodology-title">Methodology</h2>
+      <p>The percentage change in affordability is [(end wage index / start wage index) / (end price index / start price index) - 1] &times; 100. Both indexes use the same selected quarters. Wages are ABS total hourly rates of pay excluding bonuses, all industries, private and public sectors, original series. <a href="https://www.abs.gov.au/statistics/economy/price-indexes-and-inflation/consumer-price-index-australia/jul-2026">CPI Table 18</a>; <a href="https://www.abs.gov.au/statistics/economy/price-indexes-and-inflation/wage-price-index-australia/jun-2026">WPI Table 1</a>. Bundled data through Q2 2026.</p>
+    </section>
   </main>
 
   <!-- TWEAKS PANEL -->
