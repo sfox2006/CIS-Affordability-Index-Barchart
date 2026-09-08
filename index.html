@@ -451,11 +451,6 @@
       font-size: 0.81rem; color: var(--muted); line-height: 1.55;
     }
     .info-popover.is-open { display: block; }
-    .annotation-dialog { width: min(420px, calc(100% - 32px)); border: 1px solid var(--line); border-radius: 8px; padding: 24px; background: var(--surface); color: var(--ink); }
-    .annotation-dialog::backdrop { background: rgba(0,0,0,0.3); }
-    .annotation-dialog textarea { display: block; width: 100%; box-sizing: border-box; margin: 12px 0; font: inherit; }
-    .annotation-dialog button { padding: 8px 16px; cursor: pointer; }
-    #chart-notes { color: var(--muted); font-size: 0.85rem; overflow-wrap: anywhere; }
     .methodology-note { margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--line); color: var(--muted); font-size: 0.81rem; line-height: 1.6; }
     .methodology-note h2 { font-size: 1rem; color: var(--ink); margin: 0 0 8px; }
     .methodology-note p { margin: 0; }
@@ -506,7 +501,7 @@
     }
     .chart-frame svg { width: 100%; height: auto; display: block; }
 
-    /* Chart download/annotation buttons */
+    /* Chart download button */
     .chart-actions {
       position: absolute; top: 12px; right: 12px;
       display: flex; gap: 6px;
@@ -817,9 +812,6 @@
 
       <article class="chart-card">
         <div class="chart-actions">
-          <button class="chart-action-btn" id="anno-btn-wpi" title="Add annotation">
-            <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1v11M1 6.5h11" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-          </button>
           <button class="chart-action-btn" id="dl-btn-wpi" title="Download PNG">
             <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1v7M4 6l2.5 2.5L9 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M1 10h11" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
           </button>
@@ -844,7 +836,6 @@
           <div class="ranking-list" id="ranking-list"></div>
         </div>
         <p id="empty-state" class="empty-state">Pick a good or group to draw the comparison.</p>
-        <ol id="chart-notes" aria-label="Chart notes"></ol>
       </article>
 
     </section>
@@ -855,15 +846,6 @@
     </section>
   </main>
 
-  <dialog id="annotation-dialog" class="annotation-dialog" aria-labelledby="annotation-title">
-    <form id="annotation-form">
-      <h2 id="annotation-title">Add annotation</h2>
-      <label for="annotation-text">Note</label>
-      <textarea id="annotation-text" rows="3" maxlength="300" required></textarea>
-      <button type="button" id="annotation-cancel">Cancel</button>
-      <button type="submit">Add note</button>
-    </form>
-  </dialog>
   <!-- TWEAKS PANEL -->
   <div class="tweaks-panel" id="tweaks-panel">
     <div class="tweaks-title">Tweaks</div>
@@ -999,20 +981,7 @@
         node.style.setProperty(property, style.getPropertyValue(property));
       }
     });
-    document.querySelectorAll("#chart-notes li").forEach((note, index) => {
-      const lines = (String(index + 1) + ". " + note.textContent).match(/.{1,90}(?:\s|$)|.{1,90}/g) || [];
-      lines.forEach((line) => {
-        height += 22;
-        const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
-        label.setAttribute("x", "20");
-        label.setAttribute("y", String(height));
-        label.setAttribute("fill", "#263d38");
-        label.setAttribute("font-size", "14");
-        label.textContent = line;
-        copy.appendChild(label);
-      });
-    });
-    // Reserve a footer below the chart and any user annotations in the export.
+    // Reserve a footer below the chart for the attribution in the export.
     const attribution = "Centre for Independent Studies | CIS.org.au";
     const measure = document.createElement("canvas").getContext("2d");
     measure.font = "14px Arial, sans-serif";
@@ -1081,26 +1050,6 @@
   }
 
   document.getElementById("dl-btn-wpi")?.addEventListener("click", () => downloadChartPng("wpi-chart", "cis-price-vs-wpi"));
-
-  const annotationDialog = document.getElementById("annotation-dialog");
-  const annotationText = document.getElementById("annotation-text");
-  function setupWpiAnnotation() {
-    annotationText.value = "";
-    annotationDialog.showModal();
-    annotationText.focus();
-  }
-
-  document.getElementById("anno-btn-wpi")?.addEventListener("click", setupWpiAnnotation);
-  document.getElementById("annotation-cancel").addEventListener("click", () => annotationDialog.close());
-  document.getElementById("annotation-form").addEventListener("submit", (event) => {
-    event.preventDefault();
-    const note = annotationText.value.trim();
-    if (!note) return;
-    const item = document.createElement("li");
-    item.textContent = note;
-    document.getElementById("chart-notes").appendChild(item);
-    annotationDialog.close();
-  });
 
   window.addEventListener("load", () => {
     const saved = loadFromHash();
