@@ -516,7 +516,7 @@ function renderBasketRows() {
     }));
     fillSelect(select, options);
     select.value = row.seriesId;
-    select.style.cssText = "width:100%;min-height:40px;padding:0 14px;border-radius:8px;border:1.5px solid var(--line);background:var(--surface);font:600 0.88rem Raleway,sans-serif;color:var(--ink);appearance:none;cursor:pointer;";
+    select.style.cssText = "width:100%;min-height:40px;padding:0 14px;border-radius:8px;border:1.5px solid var(--line);background:var(--surface);font:600 0.88rem Manrope,sans-serif;color:var(--ink);appearance:none;cursor:pointer;";
     select.addEventListener("change", () => {
       row.seriesId = select.value;
       refreshModeView();
