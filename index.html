@@ -34,12 +34,12 @@
   </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     /* Section */
     :root {
-      --cg: #0e6b5c;
-      --cg-dark: #0a4a3e;
+      --cg: #007f71;
+      --cg-dark: #005953;
       --cg-xdark: #071f1a;
       --teal: #7fa89d;
       --blue: #0b6ea8;
@@ -48,21 +48,21 @@
       --good: #198754;
       --bad: #c43c35;
 
-      --bg: #f4f8f6;
-      --bg2: #edf4f0;
+      --bg: #f7f7f7;
+      --bg2: #f2f2f2;
       --surface: #ffffff;
-      --surface2: #f7faf8;
-      --ink: #16362f;
-      --muted: #5a706a;
-      --line: rgba(22,54,47,0.11);
-      --line2: rgba(22,54,47,0.06);
+      --surface2: #fafafa;
+      --ink: #161619;
+      --muted: #555555;
+      --line: #dddddd;
+      --line2: #eeeeee;
 
-      --sh-sm: 0 1px 3px rgba(14,107,92,0.07), 0 2px 8px rgba(14,107,92,0.06);
-      --sh: 0 4px 20px rgba(14,107,92,0.09), 0 1px 4px rgba(14,107,92,0.06);
-      --sh-lg: 0 12px 48px rgba(14,107,92,0.12);
+      --sh-sm: 0 1px 3px rgba(0,0,0,0.06);
+      --sh: none;
+      --sh-lg: 0 8px 24px rgba(0,0,0,0.12);
 
-      --r: 16px;
-      --r-lg: 24px;
+      --r: 4px;
+      --r-lg: 4px;
       --nav-h: 64px;
       --page-w: 1200px;
     }
@@ -91,7 +91,7 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: 'Manrope', sans-serif;
+      font-family: 'Raleway', sans-serif;
       color: var(--ink);
       background: var(--bg);
       min-height: 100vh;
@@ -125,7 +125,7 @@
       height: 36px; padding: 0 16px;
       border-radius: 8px; border: 1px solid var(--line);
       background: transparent; color: var(--ink);
-      font: 600 0.82rem 'Manrope', sans-serif;
+      font: 600 0.82rem 'Raleway', sans-serif;
       cursor: pointer; transition: all 0.15s;
       display: flex; align-items: center; gap: 6px;
     }
@@ -183,13 +183,13 @@
     .theme-editorial .hero-copy { padding: 52px 40px 52px 52px; }
 
     .hero-h1 {
-      font-family: Georgia, 'Times New Roman', serif;
+      font-family: 'Raleway', sans-serif;
       font-variant-ligatures: none;
-      font-weight: 600;
-      line-height: 1.05;
+      font-weight: 700;
+      line-height: 1.2;
       letter-spacing: 0;
       color: var(--cg-dark);
-      font-size: 3.4rem;
+      font-size: 2.875rem;
       max-width: none;
       margin-bottom: 18px;
     }
@@ -197,7 +197,7 @@
     .theme-dark .hero-h1 { color: var(--ink); }
 
     .hero-lead {
-      font-size: 1rem; line-height: 1.65; color: var(--muted);
+      font-size: 1.125rem; line-height: 1.5; color: var(--ink);
       max-width: none; margin-bottom: 0;
     }
     .theme-editorial .hero-lead { color: rgba(255,255,255,0.7); }
@@ -231,7 +231,7 @@
       border-radius: 10px;
       border: 1.5px solid var(--line);
       background: var(--bg);
-      font: 600 0.9rem 'Manrope', sans-serif;
+      font: 600 0.9rem 'Raleway', sans-serif;
       color: var(--ink);
       appearance: none;
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%235a706a' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
@@ -273,7 +273,7 @@
       transition: background 0.35s;
     }
     .basket-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 6px; }
-    .basket-title { font-family: 'Fraunces', serif; font-size: 1.3rem; font-weight: 600; color: var(--ink); }
+    .basket-title { font-family: 'Raleway', sans-serif; font-size: 1.5rem; font-weight: 700; color: var(--cg-dark); }
     .basket-actions { display: flex; gap: 10px; flex-shrink: 0; }
     .basket-explainer {
       display: flex; align-items: flex-start; gap: 10px;
@@ -310,7 +310,7 @@
       height: 38px; padding: 0 14px;
       border-radius: 8px; border: 1.5px solid var(--line);
       background: var(--surface); color: var(--ink);
-      font: 600 0.82rem 'Manrope', sans-serif;
+      font: 600 0.82rem 'Raleway', sans-serif;
       cursor: pointer; transition: all 0.15s;
     }
     .secondary-button:hover { border-color: var(--cg); color: var(--cg); }
@@ -331,7 +331,7 @@
     .basket-row-num {
       width: 28px; height: 28px; border-radius: 50%;
       background: var(--cg); color: white;
-      font: 700 0.78rem 'Manrope', sans-serif;
+      font: 700 0.78rem 'Raleway', sans-serif;
       display: flex; align-items: center; justify-content: center;
       flex-shrink: 0;
     }
@@ -425,7 +425,7 @@
     .stat-label { font-size: 0.73rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); line-height: 1.3; }
     .stat-card-accent .stat-label { color: rgba(255,255,255,0.7); }
     .stat-value {
-      font-family: 'Fraunces', serif;
+      font-family: 'Raleway', sans-serif;
       font-size: clamp(1.8rem, 3vw, 2.6rem);
       font-weight: 600; letter-spacing: -0.04em; line-height: 1;
       color: var(--ink);
@@ -438,7 +438,7 @@
       width: 24px; height: 24px; flex-shrink: 0;
       border-radius: 50%; border: 1.5px solid var(--line);
       background: transparent; color: var(--muted);
-      font: 700 0.75rem 'Manrope', sans-serif;
+      font: 700 0.75rem 'Raleway', sans-serif;
       cursor: pointer; transition: all 0.15s;
       display: flex; align-items: center; justify-content: center;
     }
@@ -482,8 +482,8 @@
       align-items: flex-start; gap: 12px; margin-bottom: 8px;
     }
     .chart-title {
-      font-family: 'Fraunces', serif;
-      font-size: 1.15rem; font-weight: 600; color: var(--ink);
+      font-family: 'Raleway', sans-serif;
+      font-size: 1.25rem; font-weight: 700; color: var(--cg-dark);
     }
     .chart-subtitle { font-size: 0.78rem; color: var(--muted); text-align: right; max-width: 32ch; line-height: 1.4; }
     .chart-head-right { display: flex; align-items: flex-start; gap: 8px; }
@@ -526,7 +526,7 @@
     .axis-label {
       fill: var(--muted, #5a706a);
       font-size: 11px;
-      font-family: 'Manrope', sans-serif;
+      font-family: 'Raleway', sans-serif;
     }
     .axis-line, .grid-line {
       stroke: rgba(22,54,47,0.1); stroke-width: 1;
@@ -631,7 +631,7 @@
     }
     .anno-input {
       width: 100%; border: 1px solid var(--line); border-radius: 8px;
-      padding: 8px 10px; font: 0.82rem 'Manrope', sans-serif;
+      padding: 8px 10px; font: 0.82rem 'Raleway', sans-serif;
       color: var(--ink); background: var(--bg);
       resize: none; outline: none;
     }
@@ -639,7 +639,7 @@
     .anno-actions { display: flex; gap: 6px; margin-top: 8px; justify-content: flex-end; }
     .anno-save, .anno-cancel {
       height: 28px; padding: 0 12px; border-radius: 6px;
-      font: 600 0.78rem 'Manrope', sans-serif; cursor: pointer;
+      font: 600 0.78rem 'Raleway', sans-serif; cursor: pointer;
       border: 1px solid var(--line);
     }
     .anno-save { background: var(--cg); color: white; border-color: var(--cg); }
@@ -670,7 +670,7 @@
       height: 32px; padding: 0 12px;
       border-radius: 8px; border: 1.5px solid var(--line);
       background: var(--bg); color: var(--ink);
-      font: 600 0.78rem 'Manrope', sans-serif;
+      font: 600 0.78rem 'Raleway', sans-serif;
       cursor: pointer; transition: all 0.15s;
     }
     .tweak-opt.active { background: var(--cg); color: white; border-color: var(--cg); }
@@ -693,6 +693,34 @@
     }
     .section-eyebrow::before { content: '•'; color: var(--cg); font-size: 1rem; }
 
+    /* Match the CIS site's flat sections, typography and compact controls. */
+    body { letter-spacing: 0; }
+    .shell { padding-top: 28px; }
+    body .hero, .controls-card, .basket-card, .chart-card {
+      background: transparent;
+      border: 0;
+      border-radius: 0;
+      box-shadow: none;
+    }
+    .hero-copy { padding: 12px 0 28px; }
+    .controls-card { padding: 24px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    .basket-card { padding: 16px 0 24px; }
+    .chart-card { padding: 36px 0 0; }
+    .chart-frame { background: var(--surface); border-radius: 4px; padding: 22px 16px; }
+    .basket-explainer { background: #edf5f4; border-color: #d8e6e4; }
+    .ctrl-group select, .secondary-button, .danger-button, .basket-row,
+    .basket-explainer, .chart-action-btn, .quarter-legend { border-radius: 4px; }
+    .ctrl-group select { background-color: var(--surface); }
+    .secondary-button { color: var(--cg-dark); border-color: var(--cg); }
+    #add-basket-row { background: var(--cg); color: white; }
+    #add-basket-row:hover { background: var(--cg-dark); }
+    .ctrl-label, .basket-col-label, .section-eyebrow, .bar-axis-label,
+    .tooltip-date { letter-spacing: 0; }
+    .section-eyebrow { color: var(--cg-dark); }
+    .methodology-note h2 { color: var(--cg-dark); }
+    .methodology-note a { color: var(--cg-dark); text-underline-offset: 3px; }
+    button:focus-visible, a:focus-visible { outline: 2px solid var(--cg); outline-offset: 3px; }
+
     /* Section */
     @media (max-width: 1024px) {
       .stats-grid { grid-template-columns: repeat(3, 1fr); }
@@ -709,10 +737,10 @@
       .nav-label { display: none; }
       .nav-sep { display: none; }
       .nav-btn:not(.nav-btn-primary) { display: none; }
-      .hero-copy { padding: 24px 20px; }
+      .hero-copy { padding: 12px 0 20px; }
       .hero-h1 { font-size: 2rem; }
-      .controls-card { padding: 18px 16px; }
-      .chart-card { padding: 20px 16px 18px; }
+      .controls-card { padding: 18px 0; }
+      .chart-card { padding: 20px 0 18px; }
       .chart-header { flex-direction: column; padding-top: 26px; }
       .chart-head-right { width: 100%; }
       .chart-subtitle { text-align: left; max-width: none; }
@@ -878,7 +906,7 @@
   </div>
 
   <script src="data.js?v=5"></script>
-  <script src="app.js?v=5"></script>
+  <script src="app.js?v=6"></script>
   <script src="embed-frame.js?v=1"></script>
 
   <script>
@@ -1006,7 +1034,7 @@
         const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
         label.setAttribute("x", "20");
         label.setAttribute("y", String(height));
-        label.setAttribute("fill", "#263d38");
+        label.setAttribute("fill", "#161619");
         label.setAttribute("font-size", "14");
         label.textContent = line;
         copy.appendChild(label);
@@ -1027,7 +1055,7 @@
       canvas.width = width * scale;
       canvas.height = height * scale;
       const context = canvas.getContext("2d");
-      context.fillStyle = "#f7faf8";
+      context.fillStyle = "#ffffff";
       context.fillRect(0, 0, canvas.width, canvas.height);
       context.scale(scale, scale);
       context.drawImage(image, 0, 0);
