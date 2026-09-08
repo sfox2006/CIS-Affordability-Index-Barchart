@@ -1,0 +1,73 @@
+name: Update ABS data and publish website
+
+on:
+  schedule:
+    - cron: '23 3 * * *'
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: affordability-pages
+  cancel-in-progress: false
+
+jobs:
+  update-and-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: pip install openpyxl==3.1.5
+      - name: Test the updater
+        run: python -m unittest discover -s tests -p 'test_update_abs_data.py'
+      - name: Download and validate both ABS workbooks
+        if: github.event_name != 'push'
+        run: python scripts/update_abs_data.py
+      - name: Verify calculations and embedding
+        run: node --test tests/calculations.test.cjs tests/embed.test.cjs
+      - name: Commit validated data and monthly check record
+        if: github.event_name != 'push'
+        shell: bash
+        run: |
+          # A monthly successful-check record also keeps the daily schedule active
+          # during the gaps between quarterly ABS releases.
+          date -u +%Y-%m > .github/abs-last-successful-check.txt
+          git add data.js index.html .github/abs-last-successful-check.txt
+          if ! git diff --cached --quiet; then
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git commit -m 'Refresh ABS data and successful check record'
+            git push origin HEAD:main
+          fi
+      - name: Prepare public website files
+        shell: bash
+        run: |
+          mkdir _site
+          cp index.html *.js *.css *.svg _site/
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+  deploy:
+    needs: update-and-build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy the validated website
+        id: deployment
+        uses: actions/deploy-pages@v4
