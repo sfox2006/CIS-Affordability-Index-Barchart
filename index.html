@@ -473,15 +473,19 @@
       position: relative;
     }
     .chart-header {
-      display: flex; justify-content: space-between;
-      align-items: flex-start; gap: 12px; margin-bottom: 8px;
+      display: flex; flex-direction: column;
+      align-items: stretch; gap: 16px; margin-bottom: 16px;
     }
     .chart-title {
       font-family: 'Fraunces', serif;
       font-size: 1.15rem; font-weight: 600; color: var(--ink);
     }
-    .chart-subtitle { font-size: 0.78rem; color: var(--muted); text-align: right; max-width: 32ch; line-height: 1.4; }
-    .chart-head-right { display: flex; align-items: flex-start; gap: 8px; }
+    .chart-subtitle { font-size: 0.78rem; color: var(--muted); text-align: left; min-width: 0; line-height: 1.5; }
+    .chart-head-right {
+      display: grid; grid-template-columns: 24px minmax(0, 1fr) auto;
+      align-items: center; gap: 16px; width: 100%;
+    }
+    .chart-head-right .info-btn { margin: 0; }
     .chart-legend {
       display: flex; gap: 18px; flex-wrap: wrap;
       margin: 10px 0 14px;
@@ -503,8 +507,8 @@
 
     /* Chart download button */
     .chart-actions {
-      position: absolute; top: 12px; right: 12px;
-      display: flex; gap: 6px;
+      display: flex; align-items: center;
+      padding-left: 16px; border-left: 1px solid var(--line);
     }
     .chart-action-btn {
       width: 30px; height: 30px;
@@ -708,7 +712,7 @@
       .hero-h1 { font-size: 2rem; }
       .controls-card { padding: 18px 16px; }
       .chart-card { padding: 20px 16px 18px; }
-      .chart-header { flex-direction: column; padding-top: 26px; }
+      .chart-header { flex-direction: column; }
       .chart-head-right { width: 100%; }
       .chart-subtitle { text-align: left; max-width: none; }
       .ranking-row { grid-template-columns: 26px minmax(0, 1fr); gap: 6px 10px; }
@@ -811,11 +815,6 @@
     <section class="charts-grid">
 
       <article class="chart-card">
-        <div class="chart-actions">
-          <button class="chart-action-btn" id="dl-btn-wpi" title="Download PNG">
-            <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1v7M4 6l2.5 2.5L9 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M1 10h11" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-          </button>
-        </div>
         <div class="chart-header">
           <div>
             <p class="eyebrow"><span class="eyebrow-dot"></span> Affordability</p>
@@ -824,6 +823,11 @@
           <div class="chart-head-right">
             <button class="info-btn" type="button" data-info-toggle="wpi-chart-info" aria-label="Info">i</button>
             <p id="wpi-chart-subtitle" class="chart-subtitle">Percentage change in how much wages can buy.</p>
+            <div class="chart-actions">
+              <button class="chart-action-btn" id="dl-btn-wpi" type="button" title="Download PNG" aria-label="Download PNG">
+                <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1v7M4 6l2.5 2.5L9 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M1 10h11" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+              </button>
+            </div>
           </div>
         </div>
         <div id="wpi-chart-info" class="info-popover">A positive 20% means wages can buy 20% more of the good; a negative 20% means wages can buy 20% less.</div>
