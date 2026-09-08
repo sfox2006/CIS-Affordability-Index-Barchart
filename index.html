@@ -176,6 +176,7 @@
     }
 
     .hero-copy {
+      min-width: 0;
       padding: 40px 40px 40px 44px;
     }
 
@@ -185,10 +186,10 @@
       font-family: 'Fraunces', serif;
       font-weight: 600;
       line-height: 1.05;
-      letter-spacing: -0.02em;
+      letter-spacing: 0;
       color: var(--cg-dark);
-      font-size: clamp(2rem, 4vw, 3.4rem);
-      max-width: 16ch;
+      font-size: 3.4rem;
+      max-width: none;
       margin-bottom: 18px;
     }
     .theme-editorial .hero-h1 { color: #ffffff; }
@@ -196,7 +197,7 @@
 
     .hero-lead {
       font-size: 1rem; line-height: 1.65; color: var(--muted);
-      max-width: 62ch; margin-bottom: 0;
+      max-width: none; margin-bottom: 0;
     }
     .theme-editorial .hero-lead { color: rgba(255,255,255,0.7); }
 
@@ -708,6 +709,7 @@
       .nav-sep { display: none; }
       .nav-btn:not(.nav-btn-primary) { display: none; }
       .hero-copy { padding: 24px 20px; }
+      .hero-h1 { font-size: 2rem; }
       .controls-card { padding: 18px 16px; }
       .chart-card { padding: 20px 16px 18px; }
       .chart-header { flex-direction: column; padding-top: 26px; }
