@@ -27,6 +27,24 @@ function close(actual, expected) {
   assert.ok(Math.abs(actual - expected) < 1e-9, `${actual} != ${expected}`);
 }
 
+test('starts with one placeholder and only charts explicitly selected goods', () => {
+  const { run, nodes } = app();
+  assert.equal(run('state.basketRows.length'), 1);
+  assert.equal(run('getBasketSelections().length'), 0);
+  const select = nodes.get('basket-rows').children[0].children[1];
+  assert.equal(select.value, '');
+  assert.equal(select.children[0].textContent, 'Select good');
+  assert.equal(select.children[0].disabled, true);
+  assert.equal(nodes.get('wpi-chart').innerHTML, '');
+  assert.ok(nodes.get('start-date-search').value);
+  run('addBasketRow(); renderBasketRows()');
+  assert.equal(run('getBasketSelections().length'), 0);
+  assert.ok(!nodes.get('basket-summary').textContent.includes('Duplicate'));
+  run('state.basketRows[0].seriesId = getAvailableSeries()[0].seriesId; refreshModeView()');
+  assert.equal(run('getBasketSelections().length'), 1);
+  assert.ok(nodes.get('wpi-chart').innerHTML.length > 0);
+});
+
 test('ratio uses growth factors and is independent of index reference bases', () => {
   const { run } = app();
   close(run('computeAffordabilityChange(100, 120, 100, 110)'), -8.333333333333);
@@ -74,6 +92,7 @@ test('all bundled goods and endpoint pairs agree with independently computed pri
 
 test('quick ranges cover full calendar years and selections preserve custom dates', () => {
   const { run, nodes } = app();
+  run('state.basketRows[0].seriesId = getAvailableSeries()[0].seriesId; refreshModeView()');
   for (const years of [1, 3, 5, 10]) {
     nodes.get('time-horizon-search').value = `${years}y`;
     run('applyQuickRange()');
@@ -91,6 +110,7 @@ test('quick ranges cover full calendar years and selections preserve custom date
 
 test('missing wages and shorter goods histories cannot silently change chart endpoints', () => {
   const { run, nodes } = app();
+  run('state.basketRows[0].seriesId = getAvailableSeries()[0].seriesId; refreshModeView()');
   run(`WPI_DATA.pop(); updateBasketView()`);
   assert.equal(nodes.get('end-date-search').value, '2026-03-01');
   nodes.get('end-date-search').value = '2026-06-01';
@@ -104,6 +124,7 @@ test('missing wages and shorter goods histories cannot silently change chart end
 
 test('same quarter is zero and chart labels stay correct across time zones', () => {
   const { run, nodes } = app();
+  run('state.basketRows[0].seriesId = getAvailableSeries()[0].seriesId; refreshModeView()');
   nodes.get('start-date-search').value = '2020-03-01';
   nodes.get('end-date-search').value = '2020-03-01';
   run('updateView()');

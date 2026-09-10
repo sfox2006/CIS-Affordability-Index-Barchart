@@ -466,6 +466,10 @@ function buildBasketSeries() {
 }
 
 function updateView() {
+  if (!getBasketSelections().length) {
+    resetEmptyState("Select a good to build a chart.");
+    return;
+  }
   if (!state.sharedPoints.length) {
     return;
   }
@@ -498,7 +502,7 @@ function updateView() {
 
 function renderBasketRows() {
   elements.basketRows.innerHTML = "";
-  const usedIds = state.basketRows.map((row) => row.seriesId);
+  const usedIds = state.basketRows.map((row) => row.seriesId).filter(Boolean);
 
   state.basketRows.forEach((row, index) => {
     const wrapper = document.createElement("div");
@@ -514,7 +518,9 @@ function renderBasketRows() {
       value: series.seriesId,
       label: series.label,
     }));
-    fillSelect(select, options);
+    fillSelect(select, [{ value: "", label: "Select good" }, ...options]);
+    select.children[0].disabled = true;
+    select.setAttribute("aria-label", `Select good ${index + 1}`);
     select.value = row.seriesId;
     select.style.cssText = "width:100%;min-height:40px;padding:0 14px;border-radius:8px;border:1.5px solid var(--line);background:var(--surface);font:600 0.88rem Manrope,sans-serif;color:var(--ink);appearance:none;cursor:pointer;";
     select.addEventListener("change", () => {
@@ -550,11 +556,9 @@ function renderBasketRows() {
 }
 
 function addBasketRow(seriesId = null) {
-  const options = getAvailableSeries();
-  const fallback = options[state.basketRows.length % options.length];
   state.basketRows.push({
     id: ++state.basketRowId,
-    seriesId: seriesId || fallback.seriesId,
+    seriesId: seriesId || "",
   });
 }
 
@@ -564,7 +568,13 @@ function updateBasketView() {
   state.sharedPoints = basket.points;
 
   if (!basket.points.length) {
-    resetEmptyState("Add at least one good to build a chart.");
+    if (!getBasketSelections().length) {
+      state.sharedPoints = getSharedRangePoints(state.cpiSeries)
+        .filter((point) => Number.isFinite(point.wpiValue) && point.wpiValue > 0);
+      populateDateSelects(state.sharedPoints);
+      applyQuickRange();
+    }
+    resetEmptyState("Select a good to build a chart.");
     return;
   }
 
@@ -595,12 +605,7 @@ async function init() {
 
   elements.horizonSelect.value = "custom";
 
-  const initialSeries =
-    dataset.series.find((series) => series.label === "Major household appliances") ||
-    dataset.series.find((series) => series.seriesId !== dataset.overallCpiSeriesId);
-
-  addBasketRow(initialSeries.seriesId);
-  addBasketRow(getAvailableSeries().find((series) => series.seriesId !== initialSeries.seriesId)?.seriesId);
+  addBasketRow();
 
   elements.startSelect.addEventListener("change", () => {
     if (elements.startSelect.value > elements.endSelect.value) {
