@@ -500,6 +500,94 @@ function updateView() {
   }
 }
 
+function createGoodPicker(row, index) {
+  const picker = document.createElement("div");
+  picker.className = "good-picker";
+  const trigger = document.createElement("button");
+  trigger.type = "button";
+  trigger.className = "good-picker-trigger";
+  trigger.id = `good-picker-${row.id}`;
+  trigger.setAttribute("aria-label", `Select good ${index + 1}`);
+  trigger.setAttribute("aria-haspopup", "listbox");
+  trigger.setAttribute("aria-expanded", "false");
+  trigger.setAttribute("aria-controls", `good-options-${row.id}`);
+  const options = getAvailableSeries();
+  trigger.textContent = options.find((item) => item.seriesId === row.seriesId)?.label || "Select good";
+
+  const list = document.createElement("div");
+  list.className = "good-picker-options";
+  list.id = `good-options-${row.id}`;
+  list.hidden = true;
+  list.setAttribute("role", "listbox");
+  list.setAttribute("aria-label", `Goods for item ${index + 1}`);
+  const close = () => {
+    list.hidden = true;
+    trigger.setAttribute("aria-expanded", "false");
+  };
+  const buttons = options.map((series) => {
+    const option = document.createElement("button");
+    option.type = "button";
+    option.className = "good-picker-option";
+    option.textContent = series.label;
+    option.tabIndex = -1;
+    option.setAttribute("role", "option");
+    option.setAttribute("aria-selected", String(series.seriesId === row.seriesId));
+    option.addEventListener("click", () => {
+      row.seriesId = series.seriesId;
+      refreshModeView();
+      document.getElementById(trigger.id)?.focus();
+    });
+    list.appendChild(option);
+    return option;
+  });
+  const focusOption = (position) => {
+    const option = buttons[(position + buttons.length) % buttons.length];
+    option?.focus({ preventScroll: true });
+    option?.scrollIntoView({ block: "nearest" });
+  };
+  const open = (last = false) => {
+    list.hidden = false;
+    trigger.setAttribute("aria-expanded", "true");
+    const selected = options.findIndex((item) => item.seriesId === row.seriesId);
+    focusOption(selected >= 0 ? selected : last ? buttons.length - 1 : 0);
+  };
+  trigger.addEventListener("click", () => list.hidden ? open() : close());
+  trigger.addEventListener("keydown", (event) => {
+    if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+      event.preventDefault();
+      open(event.key === "ArrowUp");
+    }
+  });
+  let search = "";
+  let lastTyped = 0;
+  list.addEventListener("keydown", (event) => {
+    const current = buttons.indexOf(document.activeElement);
+    const positions = { ArrowDown: current + 1, ArrowUp: current - 1, Home: 0, End: buttons.length - 1 };
+    if (event.key in positions) {
+      event.preventDefault();
+      focusOption(positions[event.key]);
+    } else if (event.key === "Escape") {
+      event.preventDefault();
+      close();
+      trigger.focus();
+    } else if (event.key === "Tab") {
+      close();
+      trigger.focus();
+    } else if (event.key.length === 1 && event.key !== " " && !event.ctrlKey && !event.metaKey && !event.altKey) {
+      event.preventDefault();
+      search = (Date.now() - lastTyped > 700 ? "" : search) + event.key.toLowerCase();
+      lastTyped = Date.now();
+      const match = options.findIndex((item) => item.label.toLowerCase().startsWith(search));
+      if (match >= 0) focusOption(match);
+    }
+  });
+  picker.addEventListener("focusout", (event) => {
+    if (!picker.contains(event.relatedTarget)) close();
+  });
+  picker.append(trigger, list);
+  return picker;
+}
+
 function renderBasketRows() {
   elements.basketRows.innerHTML = "";
   const usedIds = state.basketRows.map((row) => row.seriesId).filter(Boolean);
@@ -513,20 +601,7 @@ function renderBasketRows() {
     numBadge.className = "basket-row-num";
     numBadge.textContent = index + 1;
 
-    const select = document.createElement("select");
-    const options = getAvailableSeries().map((series) => ({
-      value: series.seriesId,
-      label: series.label,
-    }));
-    fillSelect(select, [{ value: "", label: "Select good" }, ...options]);
-    select.children[0].disabled = true;
-    select.setAttribute("aria-label", `Select good ${index + 1}`);
-    select.value = row.seriesId;
-    select.style.cssText = "width:100%;min-height:40px;padding:0 14px;border-radius:8px;border:1.5px solid var(--line);background:var(--surface);font:600 0.88rem Manrope,sans-serif;color:var(--ink);appearance:none;cursor:pointer;";
-    select.addEventListener("change", () => {
-      row.seriesId = select.value;
-      refreshModeView();
-    });
+    const picker = createGoodPicker(row, index);
 
     const removeButton = document.createElement("button");
     removeButton.type = "button";
@@ -542,7 +617,7 @@ function renderBasketRows() {
       wrapper.classList.add("basket-row-warning");
     }
 
-    wrapper.append(numBadge, select, removeButton);
+    wrapper.append(numBadge, picker, removeButton);
     elements.basketRows.appendChild(wrapper);
   });
 

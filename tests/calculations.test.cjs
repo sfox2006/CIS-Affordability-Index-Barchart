@@ -31,10 +31,10 @@ test('starts with one placeholder and only charts explicitly selected goods', ()
   const { run, nodes } = app();
   assert.equal(run('state.basketRows.length'), 1);
   assert.equal(run('getBasketSelections().length'), 0);
-  const select = nodes.get('basket-rows').children[0].children[1];
-  assert.equal(select.value, '');
-  assert.equal(select.children[0].textContent, 'Select good');
-  assert.equal(select.children[0].disabled, true);
+  const picker = nodes.get('basket-rows').children[0].children[1];
+  assert.equal(picker.children[0].textContent, 'Select good');
+  assert.equal(picker.children[1].hidden, true);
+  assert.ok(picker.children[1].children.every(option => option.textContent !== 'Select good'));
   assert.equal(nodes.get('wpi-chart').innerHTML, '');
   assert.ok(nodes.get('start-date-search').value);
   run('addBasketRow(); renderBasketRows()');
