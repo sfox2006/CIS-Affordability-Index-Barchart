@@ -279,7 +279,7 @@ function getWpiComparisonRows(filteredPoints) {
 function renderRankingList(rows) {
   if (!elements.rankingList) return;
   if (!rows.length) {
-    elements.rankingList.innerHTML = '<p class="empty-state">Add at least one good to see the ranking.</p>';
+    elements.rankingList.innerHTML = '<p class="empty-state">Add at least one item to see the ranking.</p>';
     return;
   }
 
@@ -364,7 +364,7 @@ function renderWpiComparisonChart(target, filteredPoints) {
   }).join("");
 
   target.innerHTML = `
-    <text class="comparison-heading" x="28" y="30">Good</text>
+    <text class="comparison-heading" x="28" y="30">Item</text>
     <text class="comparison-heading" x="${plotLeft}" y="30">Change in affordability (%)</text>
     <g class="comparison-key" transform="translate(${plotLeft}, 50)">
       <rect class="comparison-bar-wage" x="0" y="-11" width="16" height="10" rx="2"></rect>
@@ -393,7 +393,7 @@ function resetEmptyState(message) {
     heroStat.classList.add("metric-neutral");
   }
   if (heroStatLabel) {
-    heroStatLabel.textContent = "Select a good to see its change relative to wages";
+    heroStatLabel.textContent = "Select an item to see its change relative to wages";
   }
 }
 
@@ -425,7 +425,7 @@ function getBasketSelections() {
 function buildBasketSeries() {
   const selections = getBasketSelections();
   if (!selections.length) {
-    return { points: [], label: "Selected goods", description: "Add at least one good." };
+    return { points: [], label: "Selected items", description: "Add at least one item." };
   }
 
   const totalWeight = selections.length;
@@ -460,14 +460,14 @@ function buildBasketSeries() {
 
   return {
     points,
-    label: "Selected goods",
-    description: `${selections.length} ${selections.length === 1 ? "good" : "goods"} selected. The wage comparison shows each item separately.`,
+    label: "Selected items",
+    description: `${selections.length} ${selections.length === 1 ? "item" : "items"} selected. The wage comparison shows each item separately.`,
   };
 }
 
 function updateView() {
   if (!getBasketSelections().length) {
-    resetEmptyState("Select a good to build a chart.");
+    resetEmptyState("Select an item to build a chart.");
     return;
   }
   if (!state.sharedPoints.length) {
@@ -490,7 +490,7 @@ function updateView() {
   updateStatCards(filteredPoints);
 
   if (wpiAvailable) {
-    elements.wpiChartTitle.textContent = "Selected goods: change in affordability";
+    elements.wpiChartTitle.textContent = "Selected items: change in affordability";
     renderWpiComparisonChart(elements.wpiChart, wpiPoints);
     elements.wpiChartSubtitle.textContent = `Change in how much wages can buy (${formatQuarter(wpiPoints[0].date)} to ${formatQuarter(wpiPoints[wpiPoints.length - 1].date)}).`;
   } else {
@@ -519,7 +519,7 @@ function createGoodPicker(row, index) {
   list.id = `good-options-${row.id}`;
   list.hidden = true;
   list.setAttribute("role", "listbox");
-  list.setAttribute("aria-label", `Goods for item ${index + 1}`);
+  list.setAttribute("aria-label", `Options for item ${index + 1}`);
   const close = () => {
     list.hidden = true;
     trigger.setAttribute("aria-expanded", "false");
@@ -623,9 +623,9 @@ function renderBasketRows() {
 
   const duplicateCount = usedIds.length - new Set(usedIds).size;
   const selectionCount = getBasketSelections().length;
-  let summary = `${selectionCount} ${selectionCount === 1 ? "good" : "goods"} selected. Add more goods to compare them side by side.`;
+  let summary = `${selectionCount} ${selectionCount === 1 ? "item" : "items"} selected. Add more items to compare them side by side.`;
   if (duplicateCount > 0) {
-    summary += " Duplicate goods detected.";
+    summary += " Duplicate items detected.";
   }
   elements.basketSummary.textContent = summary;
 }
@@ -649,7 +649,7 @@ function updateBasketView() {
       populateDateSelects(state.sharedPoints);
       applyQuickRange();
     }
-    resetEmptyState("Select a good to build a chart.");
+    resetEmptyState("Select an item to build a chart.");
     return;
   }
 
@@ -657,7 +657,7 @@ function updateBasketView() {
   if (elements.horizonSelect.value !== "custom") {
     applyQuickRange();
   }
-  elements.wpiChartTitle.textContent = "Selected goods: change in affordability";
+  elements.wpiChartTitle.textContent = "Selected items: change in affordability";
   elements.wpiChartSubtitle.textContent = "Percentage change in how much wages can buy.";
   updateView();
 }
