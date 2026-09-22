@@ -507,12 +507,12 @@ function createGoodPicker(row, index) {
   trigger.type = "button";
   trigger.className = "good-picker-trigger";
   trigger.id = `good-picker-${row.id}`;
-  trigger.setAttribute("aria-label", `Select good ${index + 1}`);
+  trigger.setAttribute("aria-label", `Select item ${index + 1}`);
   trigger.setAttribute("aria-haspopup", "listbox");
   trigger.setAttribute("aria-expanded", "false");
   trigger.setAttribute("aria-controls", `good-options-${row.id}`);
   const options = getAvailableSeries();
-  trigger.textContent = options.find((item) => item.seriesId === row.seriesId)?.label || "Select good";
+  trigger.textContent = options.find((item) => item.seriesId === row.seriesId)?.label || "Select item";
 
   const list = document.createElement("div");
   list.className = "good-picker-options";
