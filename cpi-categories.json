@@ -1,0 +1,354 @@
+{
+  "source": "https://www.abs.gov.au/statistics/detailed-methodology-information/concepts-sources-methods/consumer-price-index-concepts-sources-and-methods/2025/appendix-2-analytical-series",
+  "level": "expenditure class",
+  "categories": [
+    {
+      "seriesId": "A2327061R",
+      "label": "Bread"
+    },
+    {
+      "seriesId": "A2327106J",
+      "label": "Cakes and biscuits"
+    },
+    {
+      "seriesId": "A2327151V",
+      "label": "Breakfast cereals"
+    },
+    {
+      "seriesId": "A2327196X",
+      "label": "Other cereal products"
+    },
+    {
+      "seriesId": "A2327241X",
+      "label": "Beef and veal"
+    },
+    {
+      "seriesId": "A3604358R",
+      "label": "Pork"
+    },
+    {
+      "seriesId": "A2327286C",
+      "label": "Lamb and goat"
+    },
+    {
+      "seriesId": "A2327376J",
+      "label": "Poultry"
+    },
+    {
+      "seriesId": "A2327466L",
+      "label": "Other meats"
+    },
+    {
+      "seriesId": "A2327511L",
+      "label": "Fish and other seafood"
+    },
+    {
+      "seriesId": "A2326926W",
+      "label": "Milk"
+    },
+    {
+      "seriesId": "A2326971J",
+      "label": "Cheese"
+    },
+    {
+      "seriesId": "A2327016C",
+      "label": "Ice cream and other dairy products"
+    },
+    {
+      "seriesId": "A2330931T",
+      "label": "Fruit"
+    },
+    {
+      "seriesId": "A2330976W",
+      "label": "Vegetables"
+    },
+    {
+      "seriesId": "A2327646W",
+      "label": "Eggs"
+    },
+    {
+      "seriesId": "A2327691J",
+      "label": "Jams, honey and spreads"
+    },
+    {
+      "seriesId": "A2329491A",
+      "label": "Food additives and condiments"
+    },
+    {
+      "seriesId": "A2329536V",
+      "label": "Oils and fats"
+    },
+    {
+      "seriesId": "A2331741W",
+      "label": "Snacks and confectionery"
+    },
+    {
+      "seriesId": "A2327781L",
+      "label": "Other food products n.e.c."
+    },
+    {
+      "seriesId": "A2327736A",
+      "label": "Coffee, tea and cocoa"
+    },
+    {
+      "seriesId": "A2331786A",
+      "label": "Waters, soft drinks and juices"
+    },
+    {
+      "seriesId": "A2327556T",
+      "label": "Restaurant meals"
+    },
+    {
+      "seriesId": "A2327601T",
+      "label": "Take away and fast foods"
+    },
+    {
+      "seriesId": "A2328951K",
+      "label": "Spirits"
+    },
+    {
+      "seriesId": "A2328906X",
+      "label": "Wine"
+    },
+    {
+      "seriesId": "A2328861F",
+      "label": "Beer"
+    },
+    {
+      "seriesId": "A2328996R",
+      "label": "Tobacco"
+    },
+    {
+      "seriesId": "A2329581F",
+      "label": "Garments for men"
+    },
+    {
+      "seriesId": "A2329716C",
+      "label": "Garments for women"
+    },
+    {
+      "seriesId": "A2329761R",
+      "label": "Garments for infants and children"
+    },
+    {
+      "seriesId": "A2327916K",
+      "label": "Footwear for men"
+    },
+    {
+      "seriesId": "A2327961W",
+      "label": "Footwear for women"
+    },
+    {
+      "seriesId": "A2328006T",
+      "label": "Footwear for infants and children"
+    },
+    {
+      "seriesId": "A2329851V",
+      "label": "Accessories"
+    },
+    {
+      "seriesId": "A2328051C",
+      "label": "Cleaning, repair and hire of clothing and footwear"
+    },
+    {
+      "seriesId": "A2326431V",
+      "label": "Rents"
+    },
+    {
+      "seriesId": "A2329941X",
+      "label": "New dwelling purchase by owner-occupiers"
+    },
+    {
+      "seriesId": "A2328096J",
+      "label": "Maintenance and repair of the dwelling"
+    },
+    {
+      "seriesId": "A2329986C",
+      "label": "Property rates and charges"
+    },
+    {
+      "seriesId": "A2329896X",
+      "label": "Water and sewerage"
+    },
+    {
+      "seriesId": "A2328141J",
+      "label": "Electricity"
+    },
+    {
+      "seriesId": "A2331921F",
+      "label": "Gas and other household fuels"
+    },
+    {
+      "seriesId": "A2328186L",
+      "label": "Furniture"
+    },
+    {
+      "seriesId": "A3604433C",
+      "label": "Carpets and other floor coverings"
+    },
+    {
+      "seriesId": "A3604383T",
+      "label": "Household textiles"
+    },
+    {
+      "seriesId": "A2328276T",
+      "label": "Major household appliances"
+    },
+    {
+      "seriesId": "A2331021X",
+      "label": "Small electric household appliances"
+    },
+    {
+      "seriesId": "A2331066C",
+      "label": "Glassware, tableware and household utensils"
+    },
+    {
+      "seriesId": "A2328321T",
+      "label": "Tools and equipment for house and garden"
+    },
+    {
+      "seriesId": "A2328366W",
+      "label": "Cleaning and maintenance products"
+    },
+    {
+      "seriesId": "A2329221A",
+      "label": "Personal care products"
+    },
+    {
+      "seriesId": "A2330121R",
+      "label": "Other non-durable household products"
+    },
+    {
+      "seriesId": "A2331606F",
+      "label": "Child care"
+    },
+    {
+      "seriesId": "A2329266F",
+      "label": "Hairdressing and personal grooming services"
+    },
+    {
+      "seriesId": "A2331696W",
+      "label": "Other household services"
+    },
+    {
+      "seriesId": "A2329176A",
+      "label": "Pharmaceutical products"
+    },
+    {
+      "seriesId": "A2329086W",
+      "label": "Therapeutic appliances and equipment"
+    },
+    {
+      "seriesId": "A2329041T",
+      "label": "Medical and hospital services"
+    },
+    {
+      "seriesId": "A2329131W",
+      "label": "Dental services"
+    },
+    {
+      "seriesId": "A2328591T",
+      "label": "Motor vehicles"
+    },
+    {
+      "seriesId": "A2328726R",
+      "label": "Spare parts and accessories for motor vehicles"
+    },
+    {
+      "seriesId": "A2328636K",
+      "label": "Automotive fuel"
+    },
+    {
+      "seriesId": "A2328771A",
+      "label": "Maintenance and repair of motor vehicles"
+    },
+    {
+      "seriesId": "A2328681W",
+      "label": "Other services in respect of motor vehicles"
+    },
+    {
+      "seriesId": "A2328816V",
+      "label": "Urban transport fares"
+    },
+    {
+      "seriesId": "A2328501A",
+      "label": "Postal services"
+    },
+    {
+      "seriesId": "A2328546F",
+      "label": "Telecommunication equipment and services"
+    },
+    {
+      "seriesId": "A2329311F",
+      "label": "Audio, visual and computing equipment"
+    },
+    {
+      "seriesId": "A3604443J",
+      "label": "Audio, visual and computing media and services"
+    },
+    {
+      "seriesId": "A2330211V",
+      "label": "Books"
+    },
+    {
+      "seriesId": "A3604393W",
+      "label": "Newspapers, magazines and stationery"
+    },
+    {
+      "seriesId": "A2329356K",
+      "label": "Domestic holiday travel and accommodation"
+    },
+    {
+      "seriesId": "A2329401K",
+      "label": "International holiday travel and accommodation"
+    },
+    {
+      "seriesId": "A2330346C",
+      "label": "Equipment for sports, camping and open-air recreation"
+    },
+    {
+      "seriesId": "A2330391R",
+      "label": "Games, toys and hobbies"
+    },
+    {
+      "seriesId": "A2328456A",
+      "label": "Pets and related products"
+    },
+    {
+      "seriesId": "A2328411W",
+      "label": "Veterinary and other services for pets"
+    },
+    {
+      "seriesId": "A2330436J",
+      "label": "Sports participation"
+    },
+    {
+      "seriesId": "A2330481V",
+      "label": "Other recreational, sporting and cultural services"
+    },
+    {
+      "seriesId": "A2331471J",
+      "label": "Preschool and primary education"
+    },
+    {
+      "seriesId": "A2331516A",
+      "label": "Secondary education"
+    },
+    {
+      "seriesId": "A2331561L",
+      "label": "Tertiary education"
+    },
+    {
+      "seriesId": "A3602878J",
+      "label": "Insurance"
+    },
+    {
+      "seriesId": "A3604448V",
+      "label": "Deposit and loan facilities (direct charges)"
+    },
+    {
+      "seriesId": "A2332776R",
+      "label": "Other financial services"
+    }
+  ]
+}

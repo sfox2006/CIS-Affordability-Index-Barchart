@@ -1,5 +1,6 @@
 """Check release discovery and safe refresh behavior independently of live ABS."""
 import importlib.util
+import copy
 import unittest
 from datetime import datetime
 from io import BytesIO
@@ -14,6 +15,35 @@ spec.loader.exec_module(update)
 
 
 class RefreshTests(unittest.TestCase):
+    def test_specific_categories_survive_refresh_and_remove_broad_entries(self):
+        current = update.read_bundle(update.ROOT / "data.js")
+        dirty = copy.deepcopy(current)
+        series = dirty["CPI_DATA"]["series"]
+        series.append(dict(series[0], seriesId="BROAD", label="Alcohol and tobacco"))
+        series.append(copy.deepcopy(series[1]))
+        cpi = {s["seriesId"]: s["observations"] for s in series}
+        wpi = {current["WPI_METADATA"]["seriesId"]: current["WPI_DATA"]}
+        cleaned = update.rebuild(dirty, cpi, wpi)
+        self.assertEqual(cleaned, current)
+        labels = [s["label"] for s in cleaned["CPI_DATA"]["series"]]
+        self.assertEqual(len(labels), 88)  # 87 selectable, one internal baseline.
+        self.assertEqual(len(set(labels)), 88)
+        self.assertIn("Cakes and biscuits", labels)
+        self.assertNotIn("Alcoholic beverages", labels)
+        self.assertEqual(labels.count("Tobacco"), 1)
+
+    def test_missing_or_conflicting_category_fails(self):
+        current = update.read_bundle(update.ROOT / "data.js")
+        missing = copy.deepcopy(current)
+        missing["CPI_DATA"]["series"].pop()
+        with self.assertRaises(ValueError):
+            update.specific_categories(missing)
+        conflict = copy.deepcopy(current["CPI_DATA"]["series"][1])
+        conflict["observations"][0]["value"] += 1
+        current["CPI_DATA"]["series"].append(conflict)
+        with self.assertRaises(ValueError):
+            update.specific_categories(current)
+
     def test_release_discovery(self):
         html = b'<a href="/release/6401018.xlsx">Table 18</a><a href="/release/6401017.xlsx">Other</a>'
         with patch.object(update, "download", return_value=html):

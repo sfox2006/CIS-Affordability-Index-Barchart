@@ -102,8 +102,32 @@ def preserve_history(old, new):
         raise ValueError("Downloaded data removes existing quarters; keeping current bundle")
 
 
-def rebuild(bundle, cpi, wpi):
+def specific_categories(bundle):
+    """Keep reviewed expenditure-class IDs, plus the hidden overall date baseline."""
+    policy = json.loads((ROOT / "cpi-categories.json").read_text(encoding="utf-8"))
+    expected = {c["seriesId"]: c["label"] for c in policy["categories"]}
+    expected[bundle["CPI_DATA"]["overallCpiSeriesId"]] = None
+    selected = {}
+    for series in bundle["CPI_DATA"]["series"]:
+        sid = series["seriesId"]
+        if sid not in expected:
+            continue
+        if expected[sid] is not None and series["label"] != expected[sid]:
+            raise ValueError(f"Category label changed for {sid}; review ABS classification")
+        if sid in selected:
+            if selected[sid] != series:
+                raise ValueError(f"Conflicting duplicate series: {sid}")
+            continue
+        selected[sid] = series
+    if set(selected) != set(expected):
+        raise ValueError(f"Missing specific categories: {set(expected) - set(selected)}")
     updated = copy.deepcopy(bundle)
+    updated["CPI_DATA"]["series"] = copy.deepcopy(list(selected.values()))
+    return updated
+
+
+def rebuild(bundle, cpi, wpi):
+    updated = specific_categories(bundle)
     for series in updated["CPI_DATA"]["series"]:
         points = cpi[series["seriesId"]]
         preserve_history(series["observations"], points)
@@ -126,11 +150,12 @@ def main():
     parser.add_argument("--check", action="store_true", help="Validate downloads without writing files")
     args = parser.parse_args()
     current = read_bundle(ROOT / "data.js")
+    selected = specific_categories(current)
     parsed, urls = {}, {}
     for kind, (page, filename) in SOURCES.items():
         urls[kind] = latest_file(page, filename)
         print(f"Downloading {kind.upper()}: {urls[kind]}")
-        wanted = ([s["seriesId"] for s in current["CPI_DATA"]["series"]] if kind == "cpi"
+        wanted = ([s["seriesId"] for s in selected["CPI_DATA"]["series"]] if kind == "cpi"
                   else [current["WPI_METADATA"]["seriesId"]])
         parsed[kind] = workbook_series(download(urls[kind]), wanted)
     updated = rebuild(current, parsed["cpi"], parsed["wpi"])

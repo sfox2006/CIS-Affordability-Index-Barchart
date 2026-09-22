@@ -27,6 +27,18 @@ function close(actual, expected) {
   assert.ok(Math.abs(actual - expected) < 1e-9, `${actual} != ${expected}`);
 }
 
+test('picker exposes only the 87 unique expenditure classes', () => {
+  const { run } = app();
+  const labels = Array.from(run('getAvailableSeries().map(s => s.label)'));
+  assert.equal(labels.length, 87);
+  assert.equal(new Set(labels).size, 87);
+  assert.ok(labels.includes('Tobacco'));
+  assert.ok(labels.includes('Cakes and biscuits'));
+  for (const broad of ['Alcohol and tobacco', 'Alcoholic beverages', 'Food and non-alcoholic beverages']) {
+    assert.ok(!labels.includes(broad));
+  }
+});
+
 test('starts with one placeholder and only charts explicitly selected goods', () => {
   const { run, nodes } = app();
   assert.equal(run('state.basketRows.length'), 1);
